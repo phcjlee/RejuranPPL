@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPL Guide Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  :root {
+    --primary:#8B5CF6;--primary-light:#C4B5FD;--primary-dark:#7C3AED;--primary-bg:#F5F3FF;
+    --accent:#EC4899;--accent-light:#FBCFE8;--accent2:#06B6D4;
+    --bg:#FAFAFE;--card:#FFFFFF;--text:#1E1B4B;--text-light:#64748B;--text-muted:#94A3B8;--border:#E2E8F0;
+    --success:#10B981;--warning:#F59E0B;--danger:#EF4444;--rose:#F43F5E;
+    --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 20px rgba(0,0,0,0.04);
+    --shadow-hover:0 8px 40px rgba(139,92,246,0.12);
+    --radius:20px;--radius-sm:12px;--radius-xs:8px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+
+  body.viewer-mode .sidebar,body.viewer-mode .mobile-toggle{display:none!important;}
+  body.viewer-mode .main{margin-left:0;max-width:960px;margin:0 auto;padding:32px 24px;}
+  body.viewer-mode .btn-edit-only{display:none!important;}
+  .viewer-watermark{display:none;text-align:center;padding:16px;margin-bottom:24px;background:linear-gradient(135deg,var(--primary-bg),#FCE7F3);border-radius:var(--radius-sm);font-size:13px;color:var(--primary-dark);font-weight:600;}
+  body.viewer-mode .viewer-watermark{display:block;}
+  body.viewer-mode .detail-back{display:none!important;}
+
+  .sidebar{position:fixed;left:0;top:0;width:270px;height:100vh;background:linear-gradient(180deg,#1E1B4B 0%,#312E81 50%,#3B0764 100%);padding:24px 16px;z-index:100;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;}
+  .sidebar-logo{display:flex;align-items:center;gap:14px;padding:4px 8px 24px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:24px;}
+  .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(139,92,246,.3);}
+  .sidebar-logo h1{color:#fff;font-size:17px;font-weight:800;letter-spacing:-.5px;}
+  .sidebar-logo span{color:var(--primary-light);font-size:11px;font-weight:500;display:block;margin-top:2px;}
+  .nav-section{margin-bottom:28px;}
+  .nav-title{color:rgba(255,255,255,.3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:0 14px;margin-bottom:10px;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-size:13.5px;font-weight:500;margin-bottom:2px;}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+  .nav-item.active{background:rgba(139,92,246,.25);color:#fff;font-weight:600;box-shadow:inset 0 0 0 1px rgba(139,92,246,.3);}
+  .nav-item .icon{font-size:17px;width:24px;text-align:center;}
+  .nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;min-width:22px;text-align:center;}
+  .sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);}
+  .lang-toggle{display:flex;gap:4px;padding:8px 14px;}
+  .lang-btn{padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:all .2s;}
+  .lang-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+  .main{margin-left:270px;min-height:100vh;padding:32px 44px;max-width:1400px;}
+  .page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:16px;}
+  .page-header h2{font-size:28px;font-weight:900;letter-spacing:-.8px;}
+  .page-header p{color:var(--text-light);font-size:14px;margin-top:6px;}
+  .header-actions{display:flex;gap:10px;align-items:center;}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:600;border:none;cursor:pointer;transition:all .2s;font-family:inherit;white-space:nowrap;}
+  .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 4px 16px rgba(139,92,246,.3);}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,.4);}
+  .btn-accent{background:linear-gradient(135deg,var(--accent),#DB2777);color:#fff;}
+  .btn-outline{background:var(--card);color:var(--text);border:1.5px solid var(--border);}
+  .btn-outline:hover{border-color:var(--primary-light);color:var(--primary);}
+  .btn-sm{padding:7px 14px;font-size:12px;border-radius:var(--radius-xs);}
+  .btn-xs{padding:5px 10px;font-size:11px;border-radius:6px;}
+  .btn-ghost{background:transparent;color:var(--text-light);border:none;}
+  .btn-ghost:hover{color:var(--primary);background:var(--primary-bg);}
+  .btn-danger{background:var(--danger);color:#fff;}.btn-danger:hover{background:#DC2626;}
+  .btn-success{background:var(--success);color:#fff;}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px;}
+  .stat-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid var(--border);transition:transform .2s;position:relative;overflow:hidden;}
+  .stat-card:hover{transform:translateY(-2px);}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .stat-card:nth-child(1)::before{background:linear-gradient(90deg,var(--primary),var(--accent));}
+  .stat-card:nth-child(2)::before{background:linear-gradient(90deg,var(--success),#34D399);}
+  .stat-card:nth-child(3)::before{background:linear-gradient(90deg,var(--warning),#FBBF24);}
+  .stat-card:nth-child(4)::before{background:linear-gradient(90deg,var(--text-muted),#CBD5E1);}
+  .stat-icon{width:42px;height:42px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+  .stat-card:nth-child(1) .stat-icon{background:var(--primary-bg);}
+  .stat-card:nth-child(2) .stat-icon{background:#ECFDF5;}
+  .stat-card:nth-child(3) .stat-icon{background:#FFFBEB;}
+  .stat-card:nth-child(4) .stat-icon{background:#F1F5F9;}
+  .stat-value{font-size:30px;font-weight:900;letter-spacing:-1px;}
+  .stat-label{font-size:13px;color:var(--text-light);font-weight:500;margin-top:2px;}
+
+  .toolbar{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;}
+  .search-box{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 16px;flex:1;min-width:220px;transition:border-color .2s,box-shadow .2s;}
+  .search-box:focus-within{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(139,92,246,.08);}
+  .search-box input{border:none;outline:none;font-size:14px;font-family:inherit;width:100%;background:transparent;}
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;width:100%;}
+  .filter-label{font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;}
+  .pill{padding:7px 16px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--text-light);transition:all .15s;}
+  .pill:hover{border-color:var(--primary-light);color:var(--primary);}
+  .pill.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .pill-country.active{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+
+  .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:20px;}
+  .product-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;transition:all .25s;cursor:pointer;}
+  .product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--primary-light);}
+  .product-thumb{width:100%;height:180px;position:relative;overflow:hidden;}
+  .product-thumb img{width:100%;height:100%;object-fit:cover;}
+  .product-thumb-placeholder{background:linear-gradient(135deg,#EDE9FE 0%,#FCE7F3 50%,#E0F2FE 100%);display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:48px;opacity:.7;}
+  .card-badges{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;}
+  .card-badge{padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;backdrop-filter:blur(8px);}
+  .badge-active{background:rgba(16,185,129,.15);color:#059669;border:1px solid rgba(16,185,129,.2);}
+  .badge-draft{background:rgba(245,158,11,.15);color:#D97706;border:1px solid rgba(245,158,11,.2);}
+  .badge-archived{background:rgba(100,116,139,.15);color:#475569;border:1px solid rgba(100,116,139,.2);}
+  .badge-country{background:rgba(6,182,212,.12);color:#0891B2;border:1px solid rgba(6,182,212,.15);}
+  .card-type{position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(139,92,246,.12);color:var(--primary-dark);border:1px solid rgba(139,92,246,.15);backdrop-filter:blur(8px);}
+  .product-card-body{padding:20px 24px 8px;}
+  .product-name{font-size:17px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px;}
+  .product-brand{font-size:13px;color:var(--primary);font-weight:600;margin-bottom:10px;}
+  .product-desc{font-size:13px;color:var(--text-light);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .product-card-footer{padding:14px 24px 18px;display:flex;justify-content:space-between;align-items:center;}
+  .product-tags{display:flex;gap:6px;flex-wrap:wrap;}
+  .mini-tag{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;background:var(--bg);color:var(--text-muted);}
+  .card-actions{display:flex;gap:2px;}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:200;justify-content:center;align-items:flex-start;padding:24px 20px;overflow-y:auto;}
+  .modal-overlay.show{display:flex;}
+  .modal{background:var(--card);border-radius:var(--radius);width:100%;max-width:780px;box-shadow:0 25px 60px rgba(0,0,0,.25);animation:modalIn .3s ease;border:1px solid var(--border);}
+  @keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .modal-header{padding:24px 32px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .modal-header h3{font-size:20px;font-weight:800;}
+  .modal-close{width:36px;height:36px;border-radius:var(--radius-xs);border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--text-light);transition:all .2s;}
+  .modal-close:hover{background:var(--danger);color:#fff;border-color:var(--danger);}
+  .modal-body{padding:32px;max-height:70vh;overflow-y:auto;}
+  .modal-footer{padding:20px 32px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+
+  .load-existing-bar{display:flex;gap:10px;align-items:center;padding:16px;background:var(--primary-bg);border-radius:var(--radius-sm);margin-bottom:28px;flex-wrap:wrap;}
+  .load-existing-bar label{font-size:13px;font-weight:600;color:var(--primary-dark);white-space:nowrap;}
+  .load-existing-bar select{flex:1;min-width:200px;padding:8px 12px;border:1.5px solid var(--primary-light);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;outline:none;background:var(--card);}
+
+  .form-section{margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid var(--border);}
+  .form-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .form-section-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+  .badge-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--primary-bg);}
+  .form-group{margin-bottom:18px;}.form-group:last-child{margin-bottom:0;}
+  .form-label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;margin-bottom:7px;}
+  .form-label .req{color:var(--accent);font-size:11px;}
+  .form-hint{font-size:11px;color:var(--text-muted);font-weight:400;}
+  .form-input,.form-textarea,.form-select{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:13.5px;font-family:inherit;color:var(--text);background:var(--card);transition:border-color .2s,box-shadow .2s;outline:none;}
+  .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(139,92,246,.08);}
+  .form-textarea{resize:vertical;min-height:80px;line-height:1.8;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .form-row-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;}
+
+  .img-upload-area{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);position:relative;}
+  .img-upload-area:hover,.img-upload-area.dragover{border-color:var(--primary);background:var(--primary-bg);}
+  .img-upload-area.dragover{box-shadow:0 0 0 4px rgba(139,92,246,.12);}
+  .img-upload-area .icon{font-size:32px;margin-bottom:8px;display:block;}
+  .img-upload-area .text{font-size:13px;color:var(--text-light);}
+  .img-upload-area .hint{font-size:11px;color:var(--text-muted);margin-top:4px;}
+  .img-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:12px;}
+  .img-preview-item{position:relative;border-radius:var(--radius-xs);overflow:hidden;aspect-ratio:1;background:var(--bg);border:1px solid var(--border);}
+  .img-preview-item img{width:100%;height:100%;object-fit:cover;}
+  .img-preview-item .remove-img{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:6px;background:rgba(0,0,0,.6);color:#fff;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
+  .img-preview-item .img-label{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;font-weight:600;text-align:center;}
+
+  .detail-back{display:inline-flex;align-items:center;gap:8px;color:var(--text-light);font-size:14px;font-weight:500;cursor:pointer;margin-bottom:24px;padding:6px 12px;border-radius:var(--radius-xs);transition:all .2s;}
+  .detail-back:hover{color:var(--primary);background:var(--primary-bg);}
+  .detail-hero{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:24px;}
+  .detail-hero-banner{height:200px;background:linear-gradient(135deg,#EDE9FE 0%,#FCE7F3 50%,#E0F2FE 100%);position:relative;overflow:hidden;}
+  .detail-hero-banner img{width:100%;height:100%;object-fit:cover;}
+  .detail-hero-body{padding:32px 36px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;}
+  .detail-hero h2{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px;}
+  .detail-hero .brand-name{font-size:14px;color:var(--primary);font-weight:600;}
+  .detail-meta{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;}
+  .detail-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light);background:var(--bg);padding:6px 12px;border-radius:var(--radius-xs);}
+  .detail-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+  .detail-section{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .detail-section.full{grid-column:1/-1;}
+  .section-header{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .section-icon{width:32px;height:32px;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .section-content{font-size:14px;color:var(--text-light);line-height:2;white-space:pre-wrap;}
+  .selling-point-item{padding:14px 16px;background:var(--bg);border-radius:var(--radius-xs);margin-bottom:10px;border-left:3px solid var(--primary);}
+  .selling-point-item strong{display:block;font-size:13px;font-weight:700;color:var(--primary-dark);margin-bottom:4px;}
+  .selling-point-item span{font-size:13px;color:var(--text-light);line-height:1.7;}
+  .tag-grid{display:flex;gap:8px;flex-wrap:wrap;}
+  .guide-tag{padding:6px 14px;border-radius:var(--radius-xs);font-size:12px;font-weight:600;line-height:1.5;}
+  .tag-do{background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;}
+  .tag-dont{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;}
+  .tag-hashtag{background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;}
+  .tag-mention{background:#F5F3FF;color:#7C3AED;border:1px solid #DDD6FE;}
+  .tag-caution{background:#FFFBEB;color:#D97706;border:1px solid #FDE68A;}
+  .content-flow-list{counter-reset:flow;}
+  .flow-step{display:flex;gap:16px;align-items:flex-start;padding:16px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:10px;}
+  .flow-step::before{counter-increment:flow;content:'#' counter(flow);flex-shrink:0;width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .flow-step-content{flex:1;}
+  .flow-step-content strong{display:block;font-size:14px;font-weight:700;margin-bottom:4px;}
+  .flow-step-content p{font-size:13px;color:var(--text-light);line-height:1.7;}
+  .visual-guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+  .visual-item{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);background:var(--bg);}
+  .visual-item img{width:100%;aspect-ratio:1;object-fit:cover;}
+  .visual-item .label{padding:8px 12px;font-size:12px;font-weight:600;color:var(--text-light);text-align:center;}
+
+  .empty-state{text-align:center;padding:80px 20px;}
+  .empty-state .icon{font-size:56px;margin-bottom:16px;}
+  .empty-state h3{font-size:18px;margin-bottom:8px;}
+  .empty-state p{color:var(--text-muted);font-size:14px;margin-bottom:24px;}
+
+  .toast-container{position:fixed;bottom:28px;right:28px;z-index:300;display:flex;flex-direction:column;gap:8px;}
+  .toast{padding:14px 22px;border-radius:var(--radius-sm);background:var(--text);color:#fff;font-size:13.5px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.2);animation:toastIn .3s ease,toastOut .3s ease 2.7s forwards;display:flex;align-items:center;gap:8px;}
+  @keyframes toastIn{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+  @keyframes toastOut{from{opacity:1;}to{opacity:0;transform:translateY(-8px);}}
+
+  .confirm-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:250;justify-content:center;align-items:center;}
+  .confirm-overlay.show{display:flex;}
+  .confirm-box{background:var(--card);border-radius:var(--radius);padding:36px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+  .confirm-box .c-icon{font-size:40px;margin-bottom:16px;}
+  .confirm-box h4{font-size:18px;margin-bottom:8px;}
+  .confirm-box p{color:var(--text-light);font-size:14px;margin-bottom:24px;}
+  .confirm-actions{display:flex;gap:10px;justify-content:center;}
+
+  .share-link-box{display:flex;gap:8px;align-items:center;padding:14px;background:var(--bg);border-radius:var(--radius-sm);border:1.5px solid var(--border);margin-top:12px;}
+  .share-link-box input{flex:1;border:none;background:transparent;font-size:13px;font-family:'Courier New',monospace;color:var(--text);outline:none;}
+
+  .mobile-toggle{display:none;position:fixed;top:14px;left:14px;z-index:150;width:44px;height:44px;border-radius:var(--radius-sm);background:var(--card);border:1.5px solid var(--border);cursor:pointer;font-size:20px;align-items:center;justify-content:center;box-shadow:var(--shadow);}
+  @media(max-width:960px){
+    .mobile-toggle{display:flex;}.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}
+    .main{margin-left:0;padding:24px 16px;padding-top:72px;}
+    .stats-grid{grid-template-columns:repeat(2,1fr);}.product-grid{grid-template-columns:1fr;}
+    .detail-grid{grid-template-columns:1fr;}.form-row,.form-row-3,.form-row-4{grid-template-columns:1fr;}
+  }
+  ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#E2E8F0;border-radius:3px;}
+
+  /* ==================== AUTH STYLES ==================== */
+  .auth-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;z-index:10000;}
+  .auth-card{background:#fff;border-radius:24px;padding:48px 40px;width:420px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;}
+  .auth-logo{font-size:48px;margin-bottom:8px;}
+  .auth-title{font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;}
+  .auth-subtitle{font-size:14px;color:var(--text-light);margin-bottom:32px;}
+  .auth-input{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-size:15px;margin-bottom:12px;outline:none;transition:border-color .2s;font-family:inherit;}
+  .auth-input:focus{border-color:var(--primary);}
+  .auth-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;}
+  .auth-btn-primary{background:var(--primary);color:#fff;}
+  .auth-btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);}
+  .auth-divider{margin:20px 0;color:var(--text-muted);font-size:13px;display:flex;align-items:center;gap:12px;}
+  .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+  .auth-switch{font-size:14px;color:var(--text-light);margin-top:20px;}
+  .auth-switch a{color:var(--primary);font-weight:600;cursor:pointer;text-decoration:none;}
+  .auth-switch a:hover{text-decoration:underline;}
+  .auth-error{background:#FEF2F2;color:#DC2626;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;}
+  .auth-user-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;margin:0 12px 8px;background:var(--primary-bg);border-radius:12px;font-size:13px;}
+  .auth-user-bar .avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+  .auth-user-bar .info{flex:1;text-align:left;overflow:hidden;}
+  .auth-user-bar .info .email{font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:140px;}
+  .auth-user-bar .info .role{color:var(--text-muted);font-size:11px;}
+  .auth-user-bar .logout-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px;border-radius:6px;}
+  .auth-user-bar .logout-btn:hover{background:var(--border);color:var(--danger);}
+
+  /* Loading overlay */
+  .loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
+  .loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{margin-top:16px;color:var(--text-light);font-size:14px;}
+
+  /* Sync indicator */
+  .sync-indicator{position:fixed;bottom:20px;right:20px;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:1000;transition:all .3s;display:none;}
+  .sync-indicator.syncing{display:flex;align-items:center;gap:6px;background:#FEF3C7;color:#92400E;}
+  .sync-indicator.synced{display:flex;align-items:center;gap:6px;background:#D1FAE5;color:#065F46;}
+  .sync-indicator.error{display:flex;align-items:center;gap:6px;background:#FEE2E2;color:#991B1B;}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+
+// ==================== SUPABASE CONFIG ====================
+const SUPABASE_URL = 'https://zvdyaxisfgbdefhhiyyu.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2ZHlheGlzZmdiZGVmaGhpeXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyODI3NDIsImV4cCI6MjA5MTg1ODc0Mn0.LJnIUK1GeFwPRMFZZV76XL_5boPaFQdGK0QTTk26aAk';
+
+// Supabase Client 초기화
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let isViewerMode = false;
+
+// ==================== AUTH FUNCTIONS ====================
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function showLogin() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('authError').style.display = 'none';
+}
+
+function showSignup() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('signupForm').style.display = 'block';
+  document.getElementById('authError').style.display = 'none';
+}
+
+async function handleLogin() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  if (!email || !password) { showAuthError('이메일과 비밀번호를 입력해주세요.'); return; }
+
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    onAuthSuccess(data.user);
+  } catch (e) {
+    showAuthError(e.message === 'Invalid login credentials' ? '이메일 또는 비밀번호가 올바르지 않습니다.' : e.message);
+  }
+}
+
+async function handleSignup() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  if (!name || !email || !password) { showAuthError('모든 필드를 입력해주세요.'); return; }
+  if (password.length < 6) { showAuthError('비밀번호는 6자 이상이어야 합니다.'); return; }
+
+  try {
+    const { data, error } = await supabaseClient.auth.signUp({ 
+      email, password, 
+      options: { data: { display_name: name } }
+    });
+    if (error) throw error;
+
+    // 프로필 생성
+    await supabaseClient.from('user_profiles').insert({
+      id: data.user.id, email, display_name: name, role: 'editor'
+    });
+
+    onAuthSuccess(data.user);
+  } catch (e) {
+    showAuthError(e.message.includes('already registered') ? '이미 가입된 이메일입니다.' : e.message);
+  }
+}
+
+async function handleLogout() {
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  document.getElementById('authOverlay').style.display = 'flex';
+  document.getElementById('userBar').style.display = 'none';
+}
+
+function onAuthSuccess(user) {
+  currentUser = user;
+  document.getElementById('authOverlay').style.display = 'none';
+
+  // 사용자 바 업데이트
+  const bar = document.getElementById('userBar');
+  bar.style.display = 'flex';
+  const nameStr = user.user_metadata?.display_name || user.email.split('@')[0];
+  document.getElementById('userAvatar').textContent = nameStr.charAt(0).toUpperCase();
+  document.getElementById('userEmail').textContent = nameStr;
+  document.getElementById('userRole').textContent = user.email;
+
+  // 데이터 로드
+  loadFromSupabase();
+}
+
+// ==================== SUPABASE DATA OPERATIONS ====================
+function showSync(type) {
+  const el = document.getElementById('syncIndicator');
+  el.className = 'sync-indicator ' + type;
+  if (type === 'syncing') {
+    el.innerHTML = '<span>⟳</span><span>저장 중...</span>';
+  } else if (type === 'synced') {
+    el.innerHTML = '<span>✓</span><span>저장 완료</span>';
+    setTimeout(() => el.className = 'sync-indicator', 2000);
+  } else if (type === 'error') {
+    el.innerHTML = '<span>✕</span><span>저장 실패</span>';
+    setTimeout(() => el.className = 'sync-indicator', 3000);
+  }
+}
+
+// DB에서 field 이름 변환 (camelCase → snake_case)
+function toDbFields(p) {
+  return {
+    id: p.id,
+    product_name: p.name,
+    brand: p.brand,
+    category: p.category || 'cream',
+    status: p.status || 'active',
+    country: p.country || 'KR',
+    how_to_use: p.howToUse || '',
+    content_flow: p.contentFlow || '',
+    required_angles: p.visualGuide || '',
+    tags_mentions: JSON.stringify({
+      productType: p.productType || '',
+      priceInfo: p.priceInfo || '',
+      salesChannel: p.salesChannel || '',
+      startDate: p.startDate || '',
+      endDate: p.endDate || '',
+      positioning: p.positioning || '',
+      sellingPoints: p.sellingPoints || '',
+      ingredients: p.ingredients || '',
+      brandTag: p.brandTag || '',
+      hashtags: p.hashtags || '',
+      keyMention: p.keyMention || '',
+      reference: p.reference || ''
+    }),
+    dos: p.dos || '',
+    donts: p.donts || '',
+    caution: p.cautions || '',
+    additional_notes: '',
+    main_image: p.mainImage || null,
+    share_token: p.shareToken || null,
+    created_by: currentUser?.id || null
+  };
+}
+
+// DB → 앱 field 변환 (snake_case → camelCase)
+function fromDbFields(d) {
+  let extra = {};
+  try { extra = JSON.parse(d.tags_mentions || '{}'); } catch(e) {}
+  return {
+    id: d.id,
+    name: d.product_name,
+    brand: d.brand,
+    category: d.category || 'cream',
+    status: d.status || 'active',
+    country: d.country || 'KR',
+    productType: extra.productType || '',
+    priceInfo: extra.priceInfo || '',
+    salesChannel: extra.salesChannel || '',
+    startDate: extra.startDate || '',
+    endDate: extra.endDate || '',
+    positioning: extra.positioning || '',
+    sellingPoints: extra.sellingPoints || '',
+    ingredients: extra.ingredients || '',
+    howToUse: d.how_to_use || '',
+    contentFlow: d.content_flow || '',
+    visualGuide: d.required_angles || '',
+    brandTag: extra.brandTag || '',
+    hashtags: extra.hashtags || '',
+    keyMention: extra.keyMention || '',
+    dos: d.dos || '',
+    donts: d.donts || '',
+    cautions: d.caution || '',
+    reference: extra.reference || '',
+    mainImage: d.main_image || null,
+    refImages: [],
+    shareToken: d.share_token || null,
+    createdAt: d.created_at,
+    updatedAt: d.updated_at
+  };
+}
+
+async function loadFromSupabase() {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  try {
+    const { data, error } = await supabaseClient
+      .from('guides')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    products = (data || []).map(fromDbFields);
+    save(); // localStorage에도 캐시
+    renderDashboard(); renderProducts(); renderArchive();
+    updateStats(); buildCatFilter(); buildCountryFilter();
+  } catch(e) {
+    console.error('Load error:', e);
+    toast('데이터 로드 실패: ' + e.message);
+    // fallback: localStorage에서 로드
+    products = JSON.parse(localStorage.getItem('ppl_cosme_v3') || '[]');
+  } finally {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+}
+
+async function saveToSupabase(product) {
+  showSync('syncing');
+  try {
+    const dbData = toDbFields(product);
+    const { error } = await supabaseClient
+      .from('guides')
+      .upsert(dbData, { onConflict: 'id' });
+
+    if (error) throw error;
+    showSync('synced');
+  } catch(e) {
+    console.error('Save error:', e);
+    showSync('error');
+    toast('서버 저장 실패: ' + e.message);
+  }
+}
+
+async function deleteFromSupabase(id) {
+  showSync('syncing');
+  try {
+    const { error } = await supabaseClient
+      .from('guides')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    showSync('synced');
+  } catch(e) {
+    console.error('Delete error:', e);
+    showSync('error');
+  }
+}
+
+// ==================== IMAGE UPLOAD TO SUPABASE STORAGE ====================
+async function uploadImageToStorage(file) {
+  const ext = file.name.split('.').pop();
+  const fileName = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2,6) + '.' + ext;
+  const filePath = 'uploads/' + fileName;
+
+  try {
+    const { data, error } = await supabaseClient.storage
+      .from('guide-images')
+      .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+    if (error) throw error;
+
+    const { data: urlData } = supabaseClient.storage
+      .from('guide-images')
+      .getPublicUrl(filePath);
+
+    return urlData.publicUrl;
+  } catch(e) {
+    console.error('Upload error:', e);
+    toast('이미지 업로드 실패: ' + e.message);
+    // fallback: base64
+    return await fileToB64Local(file);
+  }
+}
+
+function fileToB64Local(f) {
+  return new Promise(r => {
+    const rd = new FileReader();
+    rd.onload = e => r(e.target.result);
+    rd.readAsDataURL(f);
+  });
+}
+
+// ==================== SHARE LINK (DB-based) ====================
+function generateShareToken() {
+  return 'share_' + Date.now().toString(36) + Math.random().toString(36).substr(2,8);
+}
+
+async function openShareModalDB(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+
+  let token = p.shareToken;
+  if (!token) {
+    token = generateShareToken();
+    p.shareToken = token;
+    // DB에 share_token 저장
+    await supabaseClient
+      .from('guides')
+      .update({ share_token: token })
+      .eq('id', id);
+  }
+
+  const shareUrl = window.location.href.split('#')[0].split('?')[0] + '?share=' + token;
+  document.getElementById('shareLinkInput').value = shareUrl;
+  document.getElementById('shareModal').classList.add('show');
+}
+
+async function loadSharedGuide(token) {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  try {
+    const { data, error } = await supabaseClient
+      .from('guides')
+      .select('*')
+      .eq('share_token', token)
+      .single();
+
+    if (error) throw error;
+    if (!data) { toast('가이드를 찾을 수 없습니다.'); return; }
+
+    const product = fromDbFields(data);
+    products = [product];
+
+    // 뷰어 모드로 표시
+    document.getElementById('authOverlay').style.display = 'none';
+    document.getElementById('loadingOverlay').style.display = 'none';
+    document.body.classList.add('viewer-mode');
+    isViewerMode = true;
+    viewDetail(product.id);
+  } catch(e) {
+    console.error('Share load error:', e);
+    toast('공유 가이드를 불러올 수 없습니다.');
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+}
+
+// ==================== APP INIT (with Supabase) ====================
+async function initApp() {
+  // 1. 공유 링크 체크
+  const urlParams = new URLSearchParams(window.location.search);
+  const shareToken = urlParams.get('share');
+
+  if (shareToken) {
+    // 공유 링크로 접속 → 로그인 불필요, 바로 가이드 표시
+    isViewerMode = true;
+    await loadSharedGuide(shareToken);
+    return;
+  }
+
+  // 2. 기존 세션 체크
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    onAuthSuccess(session.user);
+  } else {
+    // 로그인 화면 표시
+    document.getElementById('authOverlay').style.display = 'flex';
+  }
+
+  // 3. Auth 상태 변화 감지
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      onAuthSuccess(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+    }
+  });
+}
+
+</script>
+</head>
+<body>
+
+<!-- Auth Overlay -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-logo">💄</div>
+    <h2 class="auth-title">PPL Guide Hub</h2>
+    <p class="auth-subtitle">Cosmetics Content Guide Platform</p>
+
+    <div class="auth-error" id="authError"></div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <input type="email" class="auth-input" id="authEmail" placeholder="이메일 주소" autocomplete="email">
+      <input type="password" class="auth-input" id="authPassword" placeholder="비밀번호" autocomplete="current-password">
+      <button class="auth-btn auth-btn-primary" onclick="handleLogin()">로그인</button>
+      <div class="auth-divider">또는</div>
+      <div class="auth-switch">계정이 없으신가요? <a onclick="showSignup()">회원가입</a></div>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signupForm" style="display:none">
+      <input type="text" class="auth-input" id="signupName" placeholder="이름 (표시용)" autocomplete="name">
+      <input type="email" class="auth-input" id="signupEmail" placeholder="이메일 주소" autocomplete="email">
+      <input type="password" class="auth-input" id="signupPassword" placeholder="비밀번호 (6자 이상)" autocomplete="new-password">
+      <button class="auth-btn auth-btn-primary" onclick="handleSignup()">회원가입</button>
+      <div class="auth-divider">또는</div>
+      <div class="auth-switch">이미 계정이 있으신가요? <a onclick="showLogin()">로그인</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay" style="display:none">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">데이터를 불러오는 중...</div>
+</div>
+
+<!-- Sync Indicator -->
+<div class="sync-indicator" id="syncIndicator">
+  <span class="sync-icon">⟳</span>
+  <span class="sync-text">저장 중...</span>
+</div>
+
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">💄</div>
+    <div><h1>PPL Guide Hub</h1><span>Cosmetics Content Guide</span></div>
+  </div>
+
+    <div class="auth-user-bar" id="userBar" style="display:none">
+      <div class="avatar" id="userAvatar">?</div>
+      <div class="info">
+        <span class="email" id="userEmail">-</span>
+        <span class="role" id="userRole">-</span>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()" title="로그아웃">⏻</button>
+    </div>
+
+  <nav>
+    <div class="nav-section">
+      <div class="nav-title" data-i18n="nav.menu"></div>
+      <div class="nav-item active" onclick="showPage('dashboard')" data-page="dashboard"><span class="icon">📊</span> <span data-i18n="nav.dashboard"></span></div>
+      <div class="nav-item" onclick="showPage('products')" data-page="products"><span class="icon">💜</span> <span data-i18n="nav.guides"></span><span class="nav-badge" id="navPC">0</span></div>
+      <div class="nav-item" onclick="showPage('archive')" data-page="archive"><span class="icon">🗄️</span> <span data-i18n="nav.archive"></span><span class="nav-badge" id="navAC" style="background:#64748B">0</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-title" data-i18n="nav.manage"></div>
+      <div class="nav-item" onclick="exportData()"><span class="icon">💾</span> <span data-i18n="nav.export"></span></div>
+      <div class="nav-item" onclick="document.getElementById('importFile').click()"><span class="icon">📂</span> <span data-i18n="nav.import"></span></div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nav-item" onclick="loadSampleData()"><span class="icon">✨</span> <span data-i18n="nav.sample"></span></div>
+    <div class="lang-toggle">
+      <button class="lang-btn" data-lang="ko" onclick="setLang('ko')">🇰🇷 한국어</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">🇺🇸 English</button>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div id="page-dashboard" class="page">
+    <div class="page-header">
+      <div><h2 data-i18n="dash.title"></h2><p data-i18n="dash.subtitle"></p></div>
+      <div class="header-actions"><button class="btn btn-primary" onclick="openAddModal()">+ <span data-i18n="btn.newGuide"></span></button></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon">💜</div><div class="stat-value" id="s-total">0</div><div class="stat-label" data-i18n="stat.total"></div></div>
+      <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="s-active">0</div><div class="stat-label" data-i18n="stat.active"></div></div>
+      <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value" id="s-draft">0</div><div class="stat-label" data-i18n="stat.draft"></div></div>
+      <div class="stat-card"><div class="stat-icon">🗄️</div><div class="stat-value" id="s-archived">0</div><div class="stat-label" data-i18n="stat.archived"></div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <h3 style="font-size:17px;font-weight:700;" data-i18n="dash.recent"></h3>
+      <button class="btn btn-sm btn-ghost" onclick="showPage('products')" data-i18n="btn.viewAll"></button>
+    </div>
+    <div id="recentProducts" class="product-grid"></div>
+  </div>
+
+  <div id="page-products" class="page" style="display:none;">
+    <div class="page-header">
+      <div><h2 data-i18n="prod.title"></h2><p data-i18n="prod.subtitle"></p></div>
+      <div class="header-actions"><button class="btn btn-primary" onclick="openAddModal()">+ <span data-i18n="btn.newGuide"></span></button></div>
+    </div>
+    <div class="toolbar">
+      <div class="search-box"><span>🔍</span><input type="text" id="searchInput" data-i18n-placeholder="search.placeholder" oninput="renderProducts()"></div>
+    </div>
+    <div class="toolbar" style="margin-top:-12px;">
+      <div class="filter-row" id="catFilterRow"></div>
+    </div>
+    <div class="toolbar" style="margin-top:-12px;">
+      <div class="filter-row" id="countryFilterRow"></div>
+    </div>
+    <div id="productList" class="product-grid"></div>
+  </div>
+
+  <div id="page-archive" class="page" style="display:none;">
+    <div class="page-header"><div><h2>🗄️ <span data-i18n="nav.archive"></span></h2><p data-i18n="archive.subtitle"></p></div></div>
+    <div class="toolbar"><div class="search-box"><span>🔍</span><input type="text" id="archiveSearch" data-i18n-placeholder="search.archive" oninput="renderArchive()"></div></div>
+    <div id="archiveList" class="product-grid"></div>
+  </div>
+
+  <div id="page-detail" class="page" style="display:none;"></div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="load-existing-bar" id="loadExistingBar">
+        <label>📂 <span data-i18n="modal.loadExisting"></span></label>
+        <select id="loadExistingSelect"></select>
+        <button class="btn btn-sm btn-outline" onclick="loadExisting()" data-i18n="btn.load"></button>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title"><div class="badge-icon">📋</div> <span data-i18n="form.basicInfo"></span></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label"><span data-i18n="form.productName"></span> <span class="req">*</span></label><input type="text" class="form-input" id="f-name"></div>
+          <div class="form-group"><label class="form-label"><span data-i18n="form.brandName"></span> <span class="req">*</span></label><input type="text" class="form-input" id="f-brand"></div>
+        </div>
+        <div class="form-row-4">
+          <div class="form-group"><label class="form-label" data-i18n="form.category"></label><select class="form-select" id="f-category"></select></div>
+          <div class="form-group"><label class="form-label" data-i18n="form.status"></label><select class="form-select" id="f-status"></select></div>
+          <div class="form-group"><label class="form-label" data-i18n="form.productType"></label><input type="text" class="form-input" id="f-productType"></div>
+          <div class="form-group"><label class="form-label" data-i18n="form.country"></label><select class="form-select" id="f-country"></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" data-i18n="form.price"></label><input type="text" class="form-input" id="f-priceInfo"></div>
+          <div class="form-group"><label class="form-label" data-i18n="form.salesChannel"></label><input type="text" class="form-input" id="f-salesChannel"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" data-i18n="form.startDate"></label><input type="date" class="form-input" id="f-startDate"></div>
+          <div class="form-group"><label class="form-label" data-i18n="form.endDate"></label><input type="date" class="form-input" id="f-endDate"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title"><div class="badge-icon">🖼️</div> <span data-i18n="form.images"></span></div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="form.mainImg"></label>
+          <div class="img-upload-area" id="mainImgDrop" onclick="document.getElementById('f-mainImg').click()">
+            <span class="icon">📸</span><div class="text" data-i18n="form.imgUpload"></div><div class="hint" data-i18n="form.dragHint"></div>
+          </div>
+          <input type="file" id="f-mainImg" accept="image/*" style="display:none" onchange="handleMainImg(event)">
+          <div id="mainImgPreview" class="img-preview-grid"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span data-i18n="form.refImgs"></span> <span class="form-hint" data-i18n="form.refImgsHint"></span></label>
+          <div class="img-upload-area" id="refImgDrop" onclick="document.getElementById('f-refImgs').click()">
+            <span class="icon">🎨</span><div class="text" data-i18n="form.refImgUpload"></div><div class="hint" data-i18n="form.dragHint"></div>
+          </div>
+          <input type="file" id="f-refImgs" accept="image/*" multiple style="display:none" onchange="handleRefImgs(event)">
+          <div id="refImgsPreview" class="img-preview-grid"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title"><div class="badge-icon">⭐</div> <span data-i18n="form.sellingSection"></span></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.positioning"></label><textarea class="form-textarea" id="f-positioning" rows="2"></textarea></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.sellingPoints"></label><textarea class="form-textarea" id="f-sellingPoints" rows="5"></textarea></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.ingredients"></label><textarea class="form-textarea" id="f-ingredients" rows="2"></textarea></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.howToUse"></label><textarea class="form-textarea" id="f-howToUse" rows="2"></textarea></div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title"><div class="badge-icon">🎬</div> <span data-i18n="form.contentSection"></span></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.contentFlow"></label><textarea class="form-textarea" id="f-contentFlow" rows="5"></textarea></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.visualGuide"></label><textarea class="form-textarea" id="f-visualGuide" rows="3"></textarea></div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title"><div class="badge-icon">📢</div> <span data-i18n="form.tagSection"></span></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.brandTag"></label><input type="text" class="form-input" id="f-brandTag"></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.hashtags"></label><textarea class="form-textarea" id="f-hashtags" rows="2"></textarea></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.keyMention"></label><textarea class="form-textarea" id="f-keyMention" rows="2"></textarea></div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title"><div class="badge-icon">⚠️</div> <span data-i18n="form.cautionSection"></span></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.dos"></label><textarea class="form-textarea" id="f-dos" rows="3"></textarea></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.donts"></label><textarea class="form-textarea" id="f-donts" rows="3"></textarea></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.cautions"></label><textarea class="form-textarea" id="f-cautions" rows="2"></textarea></div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title"><div class="badge-icon">🔗</div> <span data-i18n="form.refSection"></span></div>
+        <div class="form-group"><label class="form-label" data-i18n="form.reference"></label><textarea class="form-textarea" id="f-reference" rows="2"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()" data-i18n="btn.cancel"></button>
+      <button class="btn btn-primary" onclick="saveProduct()">💾 <span data-i18n="btn.save"></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="shareModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header"><h3 data-i18n="share.title"></h3><button class="modal-close" onclick="closeShareModal()">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text-light);margin-bottom:8px;" data-i18n="share.desc"></p>
+      <div class="share-link-box"><input type="text" id="shareLinkInput" readonly><button class="btn btn-sm btn-primary" onclick="copyShareLink()" data-i18n="btn.copy"></button></div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:12px;" data-i18n="share.note"></p>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-overlay" id="confirmDialog">
+  <div class="confirm-box">
+    <div class="c-icon" id="cIcon">⚠️</div>
+    <h4 id="cTitle"></h4><p id="cMsg"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="closeConfirm()" data-i18n="btn.cancel"></button>
+      <button class="btn btn-danger" id="cBtn"></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastC"></div>
+
+<script>
+// ==================== i18n ====================
+let lang=localStorage.getItem('ppl_lang')||'ko';
+const i18n={
+ko:{
+  "nav.menu":"메뉴","nav.dashboard":"대시보드","nav.guides":"제품 가이드","nav.archive":"아카이브",
+  "nav.manage":"관리","nav.export":"데이터 내보내기","nav.import":"데이터 가져오기","nav.sample":"샘플 데이터",
+  "dash.title":"대시보드","dash.subtitle":"인플루언서 PPL 콘텐츠 가이드 현황을 한눈에 확인하세요","dash.recent":"최근 등록 가이드",
+  "stat.total":"전체 제품","stat.active":"진행중","stat.draft":"작성중","stat.archived":"완료",
+  "prod.title":"제품 가이드","prod.subtitle":"인플루언서에게 전달할 PPL 콘텐츠 가이드를 관리하세요",
+  "archive.subtitle":"완료된 PPL 캠페인 가이드를 보관합니다",
+  "filter.category":"카테고리","filter.country":"국가",
+  "cat.all":"전체","cat.ampoule":"앰플","cat.cream":"크림","cat.pad":"패드","cat.toner":"토너","cat.mask":"마스크","cat.etc":"기타",
+  "country.all":"전체",
+  "btn.newGuide":"새 가이드 등록","btn.viewAll":"전체보기 →","btn.save":"저장하기","btn.cancel":"취소",
+  "btn.load":"불러오기","btn.copy":"복사","btn.edit":"편집","btn.delete":"삭제","btn.archive":"아카이브",
+  "btn.restore":"복원","btn.copyText":"텍스트 복사","btn.shareLink":"공유링크",
+  "modal.newTitle":"새 가이드 등록","modal.editTitle":"가이드 수정",
+  "modal.loadExisting":"기존 가이드 불러오기","modal.selectGuide":"-- 선택하세요 --",
+  "form.basicInfo":"기본 정보","form.productName":"제품명","form.brandName":"브랜드명",
+  "form.category":"카테고리","form.status":"상태","form.productType":"제품 유형","form.country":"국가",
+  "form.price":"용량 / 가격","form.salesChannel":"판매처","form.startDate":"캠페인 시작일","form.endDate":"캠페인 종료일",
+  "form.images":"제품 이미지","form.mainImg":"대표 이미지","form.imgUpload":"클릭 또는 드래그하여 이미지를 업로드하세요",
+  "form.dragHint":"JPG, PNG, WEBP (최대 5MB) · 드래그 앤 드롭 지원","form.refImgs":"참고 이미지",
+  "form.refImgsHint":"— 촬영 레퍼런스, 무드보드 등","form.refImgUpload":"참고 이미지 업로드 (여러장 가능, 드래그 앤 드롭 지원)",
+  "form.sellingSection":"브랜드 & 셀링포인트","form.positioning":"브랜드 / 제품 포지셔닝",
+  "form.sellingPoints":"핵심 셀링포인트","form.ingredients":"주요 성분 / 효능","form.howToUse":"사용법 / 제형",
+  "form.contentSection":"콘텐츠 가이드","form.contentFlow":"콘텐츠 흐름 예시","form.visualGuide":"비주얼 가이드",
+  "form.tagSection":"필수 태그 & 멘트","form.brandTag":"필수 브랜드 태그","form.hashtags":"해시태그","form.keyMention":"필수 키멘트",
+  "form.cautionSection":"용어 가이드 & 주의사항","form.dos":"✅ Do's — 이렇게 표현하세요",
+  "form.donts":"❌ Don'ts — 이것은 금지예요","form.cautions":"⚠️ 추가 주의사항",
+  "form.refSection":"참고 레퍼런스","form.reference":"참고 URL / 메모",
+  "share.title":"🔗 가이드 공유 링크","share.desc":"아래 링크를 공유하면 해당 가이드만 열람할 수 있습니다. (편집 불가)",
+  "share.note":"💡 이 링크는 브라우저 LocalStorage 기반이므로, 같은 기기에서만 열람 가능합니다. 다른 기기에 공유하려면 JSON 내보내기를 이용하세요.",
+  "search.placeholder":"제품명, 브랜드로 검색...","search.archive":"아카이브 검색...",
+  "empty.noGuide":"아직 등록된 가이드가 없습니다","empty.noGuideDesc":"새 제품 가이드를 등록하거나 샘플 데이터를 불러와보세요!",
+  "empty.noResult":"제품을 찾을 수 없습니다","empty.noResultDesc":"검색 조건을 변경하거나 새 가이드를 등록하세요",
+  "empty.noArchive":"아카이브가 비어있습니다","empty.noArchiveDesc":"완료된 캠페인을 아카이브하면 여기에 보관됩니다",
+  "toast.saved":"✅ 가이드가 저장되었습니다","toast.deleted":"🗑️ 삭제되었습니다","toast.archived":"🗄️ 아카이브되었습니다",
+  "toast.restored":"✅ 복원되었습니다","toast.copied":"📋 가이드 텍스트가 복사되었습니다",
+  "toast.linkCopied":"🔗 공유 링크가 복사되었습니다","toast.exported":"💾 데이터를 내보냈습니다",
+  "toast.loaded":"📂 불러왔습니다","toast.sampleAdded":"✨ 샘플 가이드가 추가되었습니다",
+  "toast.inputRequired":"⚠️ 제품명과 브랜드를 입력해주세요","toast.selectFirst":"⚠️ 가이드를 선택해주세요",
+  "confirm.deleteTitle":"가이드 삭제","confirm.deleteMsg":"이 가이드를 영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+  "confirm.sampleTitle":"샘플 데이터 추가","confirm.sampleMsg":"기존 데이터에 샘플 데이터를 추가합니다.",
+  "confirm.ok":"확인","confirm.add":"추가하기",
+  "detail.back":"← 목록으로 돌아가기","detail.positioning":"브랜드 포지셔닝",
+  "detail.sellingPoints":"핵심 셀링포인트","detail.ingredients":"주요 성분 & 효능",
+  "detail.howToUse":"사용법 & 제형","detail.contentFlow":"콘텐츠 흐름 예시",
+  "detail.visualGuide":"비주얼 가이드 & 참고 이미지","detail.tags":"필수 태그 & 멘트",
+  "detail.dosdonts":"Do's & Don'ts","detail.doLabel":"이렇게 표현하세요","detail.dontLabel":"이것은 금지예요",
+  "detail.cautionLabel":"추가 주의사항","detail.reference":"참고 레퍼런스",
+  "detail.notWritten":"미작성","detail.refImages":"참고 이미지",
+  "viewer.badge":"📋 PPL Content Guide — 읽기 전용 뷰어",
+  "status.active":"진행중","status.draft":"작성중","status.archived":"완료",
+  "opt.status.active":"✅ 진행중","opt.status.draft":"📝 작성중",
+  "opt.country.KR":"🇰🇷 한국","opt.country.US":"🇺🇸 미국","opt.country.JP":"🇯🇵 일본",
+  "opt.country.CN":"🇨🇳 중국","opt.country.TH":"🇹🇭 태국","opt.country.VN":"🇻🇳 베트남",
+  "opt.country.EU":"🇪🇺 유럽","opt.country.GLOBAL":"🌏 글로벌",
+},
+en:{
+  "nav.menu":"MENU","nav.dashboard":"Dashboard","nav.guides":"Product Guides","nav.archive":"Archive",
+  "nav.manage":"MANAGE","nav.export":"Export Data","nav.import":"Import Data","nav.sample":"Sample Data",
+  "dash.title":"Dashboard","dash.subtitle":"Monitor your influencer PPL content guide status at a glance","dash.recent":"Recently Added",
+  "stat.total":"Total","stat.active":"Active","stat.draft":"Draft","stat.archived":"Completed",
+  "prod.title":"Product Guides","prod.subtitle":"Manage PPL content guides for influencers",
+  "archive.subtitle":"Store completed PPL campaign guides here",
+  "filter.category":"Category","filter.country":"Country",
+  "cat.all":"All","cat.ampoule":"Ampoule","cat.cream":"Cream","cat.pad":"Pad","cat.toner":"Toner","cat.mask":"Mask","cat.etc":"Others",
+  "country.all":"All",
+  "btn.newGuide":"New Guide","btn.viewAll":"View All →","btn.save":"Save","btn.cancel":"Cancel",
+  "btn.load":"Load","btn.copy":"Copy","btn.edit":"Edit","btn.delete":"Delete","btn.archive":"Archive",
+  "btn.restore":"Restore","btn.copyText":"Copy Text","btn.shareLink":"Share Link",
+  "modal.newTitle":"New Guide","modal.editTitle":"Edit Guide",
+  "modal.loadExisting":"Load from Existing Guide","modal.selectGuide":"-- Select a guide --",
+  "form.basicInfo":"Basic Info","form.productName":"Product Name","form.brandName":"Brand",
+  "form.category":"Category","form.status":"Status","form.productType":"Product Type","form.country":"Country",
+  "form.price":"Volume / Price","form.salesChannel":"Sales Channel","form.startDate":"Campaign Start","form.endDate":"Campaign End",
+  "form.images":"Product Images","form.mainImg":"Main Image","form.imgUpload":"Click or drag & drop to upload image",
+  "form.dragHint":"JPG, PNG, WEBP (max 5MB) · Drag & Drop supported","form.refImgs":"Reference Images",
+  "form.refImgsHint":"— Photo references, moodboard, etc.","form.refImgUpload":"Upload reference images (multiple, drag & drop)",
+  "form.sellingSection":"Brand & Selling Points","form.positioning":"Brand Positioning",
+  "form.sellingPoints":"Key Selling Points","form.ingredients":"Key Ingredients & Benefits","form.howToUse":"How to Use / Texture",
+  "form.contentSection":"Content Guide","form.contentFlow":"Content Flow Examples","form.visualGuide":"Visual Guide",
+  "form.tagSection":"Required Tags & Mentions","form.brandTag":"Brand Tag","form.hashtags":"Hashtags","form.keyMention":"Key Mention",
+  "form.cautionSection":"Terminology & Cautions","form.dos":"✅ Do's — Express it this way",
+  "form.donts":"❌ Don'ts — This is prohibited","form.cautions":"⚠️ Additional Cautions",
+  "form.refSection":"References","form.reference":"Reference URL / Notes",
+  "share.title":"🔗 Share Guide Link","share.desc":"Share this link to provide read-only access to this guide.",
+  "share.note":"💡 This link works on the same device (LocalStorage-based). Use JSON export for cross-device sharing.",
+  "search.placeholder":"Search by product or brand...","search.archive":"Search archive...",
+  "empty.noGuide":"No guides yet","empty.noGuideDesc":"Register a new guide or load sample data to get started!",
+  "empty.noResult":"No products found","empty.noResultDesc":"Try different criteria or register a new guide",
+  "empty.noArchive":"Archive is empty","empty.noArchiveDesc":"Completed campaigns will appear here",
+  "toast.saved":"✅ Guide saved","toast.deleted":"🗑️ Deleted","toast.archived":"🗄️ Archived",
+  "toast.restored":"✅ Restored","toast.copied":"📋 Guide text copied",
+  "toast.linkCopied":"🔗 Share link copied","toast.exported":"💾 Data exported",
+  "toast.loaded":"📂 Loaded","toast.sampleAdded":"✨ Sample guides added",
+  "toast.inputRequired":"⚠️ Product name and brand required","toast.selectFirst":"⚠️ Please select a guide",
+  "confirm.deleteTitle":"Delete Guide","confirm.deleteMsg":"Permanently delete this guide? This cannot be undone.",
+  "confirm.sampleTitle":"Add Sample Data","confirm.sampleMsg":"Add sample data to existing data.",
+  "confirm.ok":"Confirm","confirm.add":"Add",
+  "detail.back":"← Back to list","detail.positioning":"Brand Positioning",
+  "detail.sellingPoints":"Key Selling Points","detail.ingredients":"Key Ingredients & Benefits",
+  "detail.howToUse":"How to Use & Texture","detail.contentFlow":"Content Flow Examples",
+  "detail.visualGuide":"Visual Guide & Reference Images","detail.tags":"Required Tags & Mentions",
+  "detail.dosdonts":"Do's & Don'ts","detail.doLabel":"Express it this way","detail.dontLabel":"This is prohibited",
+  "detail.cautionLabel":"Additional Cautions","detail.reference":"References",
+  "detail.notWritten":"Not written","detail.refImages":"Reference Images",
+  "viewer.badge":"📋 PPL Content Guide — Read-only Viewer",
+  "status.active":"Active","status.draft":"Draft","status.archived":"Completed",
+  "opt.status.active":"✅ Active","opt.status.draft":"📝 Draft",
+  "opt.country.KR":"🇰🇷 Korea","opt.country.US":"🇺🇸 USA","opt.country.JP":"🇯🇵 Japan",
+  "opt.country.CN":"🇨🇳 China","opt.country.TH":"🇹🇭 Thailand","opt.country.VN":"🇻🇳 Vietnam",
+  "opt.country.EU":"🇪🇺 Europe","opt.country.GLOBAL":"🌏 Global",
+}
+};
+
+function t(k){return(i18n[lang]&&i18n[lang][k])||k;}
+
+// Rebuild all dynamic selects with current language
+function buildSelects(){
+  // Category
+  const catSel=document.getElementById('f-category');
+  const catVal=catSel.value||'cream';
+  catSel.innerHTML=`<option value="ampoule">💧 ${t('cat.ampoule')}</option><option value="cream">🧴 ${t('cat.cream')}</option><option value="pad">🧻 ${t('cat.pad')}</option><option value="toner">💦 ${t('cat.toner')}</option><option value="mask">🎭 ${t('cat.mask')}</option><option value="etc">📌 ${t('cat.etc')}</option>`;
+  catSel.value=catVal;
+
+  // Status
+  const stSel=document.getElementById('f-status');
+  const stVal=stSel.value||'active';
+  stSel.innerHTML=`<option value="active">${t('opt.status.active')}</option><option value="draft">${t('opt.status.draft')}</option>`;
+  stSel.value=stVal;
+
+  // Country
+  const coSel=document.getElementById('f-country');
+  const coVal=coSel.value||'KR';
+  coSel.innerHTML=['KR','US','JP','CN','TH','VN','EU','GLOBAL'].map(c=>`<option value="${c}">${t('opt.country.'+c)}</option>`).join('');
+  coSel.value=coVal;
+}
+
+function buildCatFilter(){
+  const row=document.getElementById('catFilterRow');
+  const cats=[{k:'all'},{k:'ampoule',e:'💧'},{k:'cream',e:'🧴'},{k:'pad',e:'🧻'},{k:'toner',e:'💦'},{k:'mask',e:'🎭'},{k:'etc',e:'📌'}];
+  row.innerHTML=`<span class="filter-label">${t('filter.category')}</span>`+cats.map(c=>`<div class="pill ${filterCat===c.k?'active':''}" onclick="setFilter('cat','${c.k}',this)">${c.e||''} ${t('cat.'+c.k)}</div>`).join('');
+}
+
+function buildCountryFilter(){
+  const countries=[...new Set(products.filter(p=>p.status!=='archived').map(p=>p.country||'KR'))];
+  const row=document.getElementById('countryFilterRow');
+  row.innerHTML=`<span class="filter-label">${t('filter.country')}</span><div class="pill pill-country ${filterCountry==='all'?'active':''}" onclick="setFilter('country','all',this)">${t('country.all')}</div>`+
+    countries.map(c=>`<div class="pill pill-country ${filterCountry===c?'active':''}" onclick="setFilter('country','${c}',this)">${countryFlags[c]||''} ${c}</div>`).join('');
+}
+
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(i18n[lang][k])el.textContent=i18n[lang][k];});
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder');if(i18n[lang][k])el.placeholder=i18n[lang][k];});
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('data-lang')===lang));
+  document.documentElement.lang=lang==='ko'?'ko':'en';
+  buildSelects();
+  buildCatFilter();
+  buildCountryFilter();
+}
+
+function setLang(l){lang=l;localStorage.setItem('ppl_lang',l);applyLang();renderDashboard();renderProducts();renderArchive();}
+
+// ==================== DATA ====================
+let products=JSON.parse(localStorage.getItem('ppl_cosme_v3')||'[]');
+let filterCat='all',filterCountry='all';
+let tempMainImg=null,tempRefImgs=[];
+
+const catEmojis={ampoule:'💧',cream:'🧴',pad:'🧻',toner:'💦',mask:'🎭',etc:'📌'};
+const countryFlags={KR:'🇰🇷',US:'🇺🇸',JP:'🇯🇵',CN:'🇨🇳',TH:'🇹🇭',VN:'🇻🇳',EU:'🇪🇺',GLOBAL:'🌏'};
+
+function save(){localStorage.setItem('ppl_cosme_v3',JSON.stringify(products));updateStats();}
+function genId(){return 'p'+Date.now()+Math.random().toString(36).substr(2,6);}
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+// ==================== DRAG & DROP ====================
+function setupDragDrop(areaId,isMultiple){
+  const area=document.getElementById(areaId);
+  if(!area)return;
+  ['dragenter','dragover'].forEach(ev=>area.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();area.classList.add('dragover');}));
+  ['dragleave','drop'].forEach(ev=>area.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();area.classList.remove('dragover');}));
+  area.addEventListener('drop',async e=>{
+    const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+    if(!files.length)return;
+    if(isMultiple){
+      for(const f of files) tempRefImgs.push(await fileToB64(f));
+      renderRefPreviews();
+    } else {
+      tempMainImg=await fileToB64(files[0]);
+      document.getElementById('mainImgPreview').innerHTML=`<div class="img-preview-item"><img src="${tempMainImg}"><button class="remove-img" onclick="tempMainImg=null;this.parentElement.remove()">✕</button><div class="img-label">${t('form.mainImg')}</div></div>`;
+    }
+  });
+}
+
+// ==================== IMAGE ====================
+function fileToB64(f){
+  // Supabase Storage 사용 가능하면 업로드, 아니면 base64 fallback
+  if(typeof supabaseClient!=='undefined' && currentUser){
+    return uploadImageToStorage(f);
+  }
+  return new Promise(r=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);rd.readAsDataURL(f);});
+}
+async function handleMainImg(e){
+  const f=e.target.files[0];if(!f)return;
+  tempMainImg=await fileToB64(f);
+  document.getElementById('mainImgPreview').innerHTML=`<div class="img-preview-item"><img src="${tempMainImg}"><button class="remove-img" onclick="tempMainImg=null;this.parentElement.remove()">✕</button><div class="img-label">${t('form.mainImg')}</div></div>`;
+}
+async function handleRefImgs(e){for(const f of Array.from(e.target.files))tempRefImgs.push(await fileToB64(f));renderRefPreviews();}
+function renderRefPreviews(){
+  document.getElementById('refImgsPreview').innerHTML=tempRefImgs.map((img,i)=>`<div class="img-preview-item"><img src="${img}"><button class="remove-img" onclick="tempRefImgs.splice(${i},1);renderRefPreviews()">✕</button><div class="img-label">#${i+1}</div></div>`).join('');
+}
+
+// ==================== NAV ====================
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const tgt=document.getElementById('page-'+page);if(tgt)tgt.style.display='block';
+  const nav=document.querySelector(`.nav-item[data-page="${page}"]`);if(nav)nav.classList.add('active');
+  document.querySelector('.sidebar').classList.remove('open');
+  if(page==='dashboard')renderDashboard();
+  if(page==='products'){renderProducts();buildCatFilter();buildCountryFilter();}
+  if(page==='archive')renderArchive();
+}
+
+function updateStats(){
+  const all=products.length,act=products.filter(p=>p.status==='active').length,
+    dft=products.filter(p=>p.status==='draft').length,arc=products.filter(p=>p.status==='archived').length;
+  document.getElementById('s-total').textContent=all;document.getElementById('s-active').textContent=act;
+  document.getElementById('s-draft').textContent=dft;document.getElementById('s-archived').textContent=arc;
+  document.getElementById('navPC').textContent=all-arc;document.getElementById('navAC').textContent=arc;
+}
+
+function setFilter(type,val,el){
+  if(type==='cat'){filterCat=val;el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');}
+  else{filterCountry=val;el.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');}
+  renderProducts();
+}
+
+// ==================== CARD ====================
+function makeCard(p,mode){
+  const catE=catEmojis[p.category]||'📌';
+  const stClass=p.status==='active'?'badge-active':p.status==='draft'?'badge-draft':'badge-archived';
+  const stLabel=t('status.'+p.status);
+  const dateFmt=lang==='ko'?'ko-KR':'en-US';
+  const date=new Date(p.createdAt).toLocaleDateString(dateFmt,{year:'numeric',month:'short',day:'numeric'});
+  const flag=countryFlags[p.country]||'🌏';
+  const thumb=p.mainImage?`<img src="${p.mainImage}">`:`<div class="product-thumb-placeholder">${catE}</div>`;
+  let actionBtns='';
+  if(mode==='archive'){
+    actionBtns=`<button class="btn btn-xs btn-success" onclick="event.stopPropagation();restoreProduct('${p.id}')">${t('btn.restore')}</button><button class="btn btn-xs btn-danger" onclick="event.stopPropagation();confirmDelete('${p.id}')">${t('btn.delete')}</button>`;
+  } else {
+    actionBtns=`<button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();openEditModal('${p.id}')" title="${t('btn.edit')}">✏️</button><button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();archiveProduct('${p.id}')" title="${t('btn.archive')}">🗄️</button><button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();confirmDelete('${p.id}')" title="${t('btn.delete')}" style="color:var(--danger)">🗑️</button>`;
+  }
+  return `<div class="product-card" onclick="viewDetail('${p.id}')"><div class="product-thumb">${thumb}<div class="card-badges"><span class="card-badge ${stClass}">${stLabel}</span><span class="card-badge badge-country">${flag} ${p.country||'KR'}</span></div><span class="card-type">${catE} ${t('cat.'+(p.category||'cream'))}</span></div><div class="product-card-body"><div class="product-name">${esc(p.name)}</div><div class="product-brand">${esc(p.brand)}</div><div class="product-desc">${esc(p.positioning||p.sellingPoints||'')}</div></div><div class="product-card-footer"><div class="product-tags"><span class="mini-tag">📅 ${date}</span>${p.priceInfo?`<span class="mini-tag">💰 ${esc(p.priceInfo).substring(0,25)}</span>`:''}</div><div class="card-actions" onclick="event.stopPropagation()">${actionBtns}</div></div></div>`;
+}
+
+function emptyH(icon,tk,dk,btn){return `<div class="empty-state" style="grid-column:1/-1"><div class="icon">${icon}</div><h3>${t(tk)}</h3><p>${t(dk)}</p>${btn||''}</div>`;}
+
+function renderDashboard(){
+  updateStats();
+  const recent=[...products].filter(p=>p.status!=='archived').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,6);
+  document.getElementById('recentProducts').innerHTML=recent.length?recent.map(p=>makeCard(p,'normal')).join(''):emptyH('💄','empty.noGuide','empty.noGuideDesc',`<button class="btn btn-primary" onclick="loadSampleData()">✨ ${t('nav.sample')}</button>`);
+}
+
+function renderProducts(){
+  updateStats();
+  const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
+  let list=products.filter(p=>p.status!=='archived');
+  if(filterCat!=='all')list=list.filter(p=>p.category===filterCat);
+  if(filterCountry!=='all')list=list.filter(p=>(p.country||'KR')===filterCountry);
+  if(q)list=list.filter(p=>p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q));
+  list.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  document.getElementById('productList').innerHTML=list.length?list.map(p=>makeCard(p,'normal')).join(''):emptyH('🔍','empty.noResult','empty.noResultDesc');
+}
+
+function renderArchive(){
+  const q=(document.getElementById('archiveSearch')?.value||'').toLowerCase();
+  let list=products.filter(p=>p.status==='archived');
+  if(q)list=list.filter(p=>p.name.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q));
+  list.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  document.getElementById('archiveList').innerHTML=list.length?list.map(p=>makeCard(p,'archive')).join(''):emptyH('🗄️','empty.noArchive','empty.noArchiveDesc');
+}
+
+// ==================== DETAIL ====================
+function viewDetail(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  const catE=catEmojis[p.category]||'📌';
+  const stClass=p.status==='active'?'badge-active':p.status==='draft'?'badge-draft':'badge-archived';
+  const flag=countryFlags[p.country]||'🌏';
+  const notW=`<span style="color:var(--text-muted)">${t('detail.notWritten')}</span>`;
+  document.querySelectorAll('.page').forEach(pg=>pg.style.display='none');
+  const detail=document.getElementById('page-detail');detail.style.display='block';
+
+  const spL=(p.sellingPoints||'').split('\n').filter(Boolean);
+  const spH=spL.length?spL.map((s,i)=>`<div class="selling-point-item"><strong>Point ${i+1}</strong><span>${esc(s.replace(/^[•\-]\s*/,''))}</span></div>`).join(''):notW;
+  const flL=(p.contentFlow||'').split('\n').filter(Boolean);
+  const flH=flL.length?'<div class="content-flow-list">'+flL.map(fl=>{const m=fl.match(/^\[(.+?)\]\s*(.+)/);return m?`<div class="flow-step"><div class="flow-step-content"><strong>${esc(m[1])}</strong><p>${esc(m[2])}</p></div></div>`:`<div class="flow-step"><div class="flow-step-content"><p>${esc(fl.replace(/^[•\-]\s*/,''))}</p></div></div>`;}).join('')+'</div>':notW;
+  const doH=(p.dos||'').split('\n').filter(Boolean).map(d=>`<span class="guide-tag tag-do">✅ ${esc(d.replace(/^[•\-]\s*/,''))}</span>`).join('')||notW;
+  const dnH=(p.donts||'').split('\n').filter(Boolean).map(d=>`<span class="guide-tag tag-dont">❌ ${esc(d.replace(/^[•\-]\s*/,''))}</span>`).join('')||notW;
+  const haH=(p.hashtags||'').split(/\s+/).filter(h=>h.startsWith('#')).map(h=>`<span class="guide-tag tag-hashtag">${esc(h)}</span>`).join('');
+  const caH=(p.cautions||'').split('\n').filter(Boolean).map(c=>`<span class="guide-tag tag-caution">⚠️ ${esc(c.replace(/^[•\-]\s*/,''))}</span>`).join('');
+  const viL=(p.visualGuide||'').split('\n').filter(Boolean);
+  const viH=viL.length?`<div class="section-content">${viL.map(v=>'📸 '+esc(v.replace(/^[•\-]\s*/,''))).join('\n')}</div>`:'';
+  const riH=(p.refImages&&p.refImages.length)?`<div class="visual-guide-grid">${p.refImages.map((img,i)=>`<div class="visual-item"><img src="${img}"><div class="label">${t('detail.refImages')} ${i+1}</div></div>`).join('')}</div>`:'';
+  const banner=p.mainImage?`<img src="${p.mainImage}">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px;opacity:.4">${catE}</div>`;
+  const dateFmt=lang==='ko'?'ko-KR':'en-US';
+  const dateStr=p.startDate?`${p.startDate} ~ ${p.endDate||''}`:'';
+
+  detail.innerHTML=`
+    <div class="viewer-watermark">${t('viewer.badge')}</div>
+    <div class="detail-back" onclick="showPage('${p.status==='archived'?'archive':'products'}')">${t('detail.back')}</div>
+    <div class="detail-hero"><div class="detail-hero-banner">${banner}</div>
+      <div class="detail-hero-body"><div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <span class="card-badge ${stClass}" style="position:static">${t('status.'+p.status)}</span>
+          <span class="card-badge badge-country" style="position:static">${flag} ${p.country||'KR'}</span>
+          <span class="card-badge" style="position:static;background:rgba(139,92,246,.1);color:var(--primary-dark);border:1px solid rgba(139,92,246,.15)">${catE} ${t('cat.'+(p.category||'cream'))}</span>
+          ${p.productType?`<span class="card-badge" style="position:static;background:rgba(6,182,212,.1);color:#0891B2;border:1px solid rgba(6,182,212,.15)">${esc(p.productType)}</span>`:''}
+        </div>
+        <h2>${esc(p.name)}</h2><div class="brand-name">${esc(p.brand)}</div>
+        <div class="detail-meta">
+          ${p.priceInfo?`<span class="detail-meta-item">💰 ${esc(p.priceInfo)}</span>`:''}
+          ${p.salesChannel?`<span class="detail-meta-item">🏪 ${esc(p.salesChannel)}</span>`:''}
+          ${dateStr?`<span class="detail-meta-item">📅 ${dateStr}</span>`:''}
+        </div></div>
+        <div class="detail-actions">
+          <button class="btn btn-sm btn-outline btn-edit-only" onclick="openEditModal('${p.id}')">✏️ ${t('btn.edit')}</button>
+          <button class="btn btn-sm btn-outline" onclick="copyGuideText('${p.id}')">📋 ${t('btn.copyText')}</button>
+          <button class="btn btn-sm btn-accent btn-edit-only" onclick="openShareModal('${p.id}')">🔗 ${t('btn.shareLink')}</button>
+        </div>
+      </div>
+    </div>
+    <div class="detail-grid">
+      ${p.positioning?`<div class="detail-section full"><div class="section-header"><div class="section-icon" style="background:#F5F3FF">✨</div>${t('detail.positioning')}</div><div class="section-content">${esc(p.positioning)}</div></div>`:''}
+      <div class="detail-section full"><div class="section-header"><div class="section-icon" style="background:#FEF3C7">⭐</div>${t('detail.sellingPoints')}</div>${spH}</div>
+      <div class="detail-section"><div class="section-header"><div class="section-icon" style="background:#ECFDF5">🧪</div>${t('detail.ingredients')}</div><div class="section-content">${p.ingredients?esc(p.ingredients):notW}</div></div>
+      <div class="detail-section"><div class="section-header"><div class="section-icon" style="background:#FDF2F8">🤲</div>${t('detail.howToUse')}</div><div class="section-content">${p.howToUse?esc(p.howToUse):notW}</div></div>
+      <div class="detail-section full"><div class="section-header"><div class="section-icon" style="background:#EDE9FE">🎬</div>${t('detail.contentFlow')}</div>${flH}</div>
+      <div class="detail-section full"><div class="section-header"><div class="section-icon" style="background:#FCE7F3">📸</div>${t('detail.visualGuide')}</div>${viH}${riH?`<div style="margin-top:20px"><div style="font-size:13px;font-weight:600;margin-bottom:12px">📌 ${t('detail.refImages')}</div>${riH}</div>`:''}${!viH&&!riH?notW:''}</div>
+      <div class="detail-section"><div class="section-header"><div class="section-icon" style="background:#EFF6FF">📢</div>${t('detail.tags')}</div>
+        ${p.brandTag?`<div style="margin-bottom:12px"><span class="guide-tag tag-mention">${esc(p.brandTag)}</span></div>`:''}
+        ${haH?`<div class="tag-grid" style="margin-bottom:12px">${haH}</div>`:''}
+        ${p.keyMention?`<div style="padding:12px 16px;background:var(--primary-bg);border-radius:var(--radius-xs);border-left:3px solid var(--primary);font-size:14px;font-weight:600;color:var(--primary-dark);line-height:1.8">"${esc(p.keyMention)}"</div>`:''}
+        ${!p.brandTag&&!haH&&!p.keyMention?notW:''}
+      </div>
+      <div class="detail-section"><div class="section-header"><div class="section-icon" style="background:#ECFDF5">✅</div>${t('detail.dosdonts')}</div>
+        <div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:8px">${t('detail.doLabel')}</div><div class="tag-grid">${doH}</div></div>
+        <div><div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:8px">${t('detail.dontLabel')}</div><div class="tag-grid">${dnH}</div></div>
+        ${caH?`<div style="margin-top:14px"><div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px">${t('detail.cautionLabel')}</div><div class="tag-grid">${caH}</div></div>`:''}
+      </div>
+      ${p.reference?`<div class="detail-section full"><div class="section-header"><div class="section-icon" style="background:#F1F5F9">🔗</div>${t('detail.reference')}</div><div class="section-content">${esc(p.reference)}</div></div>`:''}
+    </div>`;
+}
+
+// ==================== MODAL ====================
+const fFields=['f-name','f-brand','f-productType','f-priceInfo','f-salesChannel','f-startDate','f-endDate','f-positioning','f-sellingPoints','f-ingredients','f-howToUse','f-contentFlow','f-visualGuide','f-brandTag','f-hashtags','f-keyMention','f-dos','f-donts','f-cautions','f-reference'];
+const dKeys=['name','brand','productType','priceInfo','salesChannel','startDate','endDate','positioning','sellingPoints','ingredients','howToUse','contentFlow','visualGuide','brandTag','hashtags','keyMention','dos','donts','cautions','reference'];
+
+function populateLoadSelect(){
+  document.getElementById('loadExistingSelect').innerHTML=`<option value="">${t('modal.selectGuide')}</option>`+products.map(p=>`<option value="${p.id}">${esc(p.name)} (${esc(p.brand)}) [${countryFlags[p.country]||''}${p.country||'KR'}]</option>`).join('');
+}
+
+function loadExisting(){
+  const id=document.getElementById('loadExistingSelect').value;
+  if(!id){toast(t('toast.selectFirst'));return;}
+  const p=products.find(x=>x.id===id);if(!p)return;
+  dKeys.forEach((k,i)=>{const el=document.getElementById(fFields[i]);if(el)el.value=p[k]||'';});
+  document.getElementById('f-category').value=p.category||'cream';
+  document.getElementById('f-country').value=p.country||'KR';
+  document.getElementById('f-status').value='draft';
+  tempMainImg=p.mainImage||null;tempRefImgs=[...(p.refImages||[])];
+  const mp=document.getElementById('mainImgPreview');
+  mp.innerHTML=tempMainImg?`<div class="img-preview-item"><img src="${tempMainImg}"><button class="remove-img" onclick="tempMainImg=null;this.parentElement.remove()">✕</button></div>`:'';
+  renderRefPreviews();toast(t('toast.loaded'));
+}
+
+function openAddModal(){
+  document.getElementById('modalTitle').textContent=t('modal.newTitle');
+  document.getElementById('editId').value='';
+  document.getElementById('loadExistingBar').style.display='flex';
+  fFields.forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('f-category').value='cream';
+  document.getElementById('f-status').value='active';
+  document.getElementById('f-country').value='KR';
+  tempMainImg=null;tempRefImgs=[];
+  document.getElementById('mainImgPreview').innerHTML='';
+  document.getElementById('refImgsPreview').innerHTML='';
+  populateLoadSelect();buildSelects();
+  document.getElementById('productModal').classList.add('show');
+  // Re-setup drag drop after modal opens
+  setTimeout(()=>{setupDragDrop('mainImgDrop',false);setupDragDrop('refImgDrop',true);},100);
+}
+
+function openEditModal(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  document.getElementById('modalTitle').textContent=t('modal.editTitle');
+  document.getElementById('editId').value=id;
+  document.getElementById('loadExistingBar').style.display='none';
+  dKeys.forEach((k,i)=>{const el=document.getElementById(fFields[i]);if(el)el.value=p[k]||'';});
+  buildSelects();
+  document.getElementById('f-category').value=p.category||'cream';
+  document.getElementById('f-status').value=p.status==='archived'?'active':p.status;
+  document.getElementById('f-country').value=p.country||'KR';
+  tempMainImg=p.mainImage||null;tempRefImgs=[...(p.refImages||[])];
+  const mp=document.getElementById('mainImgPreview');
+  mp.innerHTML=tempMainImg?`<div class="img-preview-item"><img src="${tempMainImg}"><button class="remove-img" onclick="tempMainImg=null;this.parentElement.remove()">✕</button></div>`:'';
+  renderRefPreviews();
+  document.getElementById('productModal').classList.add('show');
+  setTimeout(()=>{setupDragDrop('mainImgDrop',false);setupDragDrop('refImgDrop',true);},100);
+}
+
+function closeModal(){document.getElementById('productModal').classList.remove('show');}
+
+function saveProduct(){
+  const name=document.getElementById('f-name').value.trim(),brand=document.getElementById('f-brand').value.trim();
+  if(!name||!brand){toast(t('toast.inputRequired'));return;}
+  const data={};dKeys.forEach((k,i)=>{data[k]=document.getElementById(fFields[i]).value.trim();});
+  data.category=document.getElementById('f-category').value;
+  data.status=document.getElementById('f-status').value;
+  data.country=document.getElementById('f-country').value;
+  data.mainImage=tempMainImg;data.refImages=[...tempRefImgs];
+  const editId=document.getElementById('editId').value;
+  if(editId){const idx=products.findIndex(p=>p.id===editId);if(idx>=0)products[idx]={...products[idx],...data,updatedAt:new Date().toISOString()};}
+  else products.push({id:genId(),...data,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
+  save();closeModal();renderDashboard();renderProducts();buildCountryFilter();toast(t('toast.saved'));
+  // Supabase에도 저장
+  const savedProduct = editId ? products.find(p=>p.id===editId) : products[products.length-1];
+  if(savedProduct && currentUser) saveToSupabase(savedProduct);
+}
+
+// ==================== ACTIONS ====================
+function archiveProduct(id){const p=products.find(x=>x.id===id);if(p){p.status='archived';save();renderProducts();renderDashboard();toast(t('toast.archived'));if(currentUser)saveToSupabase(p);}}
+function restoreProduct(id){const p=products.find(x=>x.id===id);if(p){p.status='active';save();renderArchive();renderDashboard();toast(t('toast.restored'));if(currentUser)saveToSupabase(p);}}
+function confirmDelete(id){
+  document.getElementById('cIcon').textContent='🗑️';
+  document.getElementById('cTitle').textContent=t('confirm.deleteTitle');
+  document.getElementById('cMsg').textContent=t('confirm.deleteMsg');
+  document.getElementById('cBtn').className='btn btn-danger';
+  document.getElementById('cBtn').textContent=t('confirm.ok');
+  document.getElementById('cBtn').onclick=()=>{const delId=id;products=products.filter(p=>p.id!==delId);save();renderProducts();renderArchive();renderDashboard();buildCountryFilter();closeConfirm();toast(t('toast.deleted'));if(currentUser)deleteFromSupabase(delId);if(document.getElementById('page-detail').style.display==='block')showPage('products');};
+  document.getElementById('confirmDialog').classList.add('show');
+}
+function closeConfirm(){document.getElementById('confirmDialog').classList.remove('show');}
+
+// ==================== SHARE ====================
+function openShareModal(id){openShareModalDB(id);}
+function closeShareModal(){document.getElementById('shareModal').classList.remove('show');}
+function copyShareLink(){const i=document.getElementById('shareLinkInput');i.select();navigator.clipboard.writeText(i.value).then(()=>toast(t('toast.linkCopied')));}
+
+// ==================== COPY TEXT ====================
+function copyGuideText(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  const flag=countryFlags[p.country]||'🌏';
+  const text=`━━━━━━━━━━━━━━━━━━━━━\n💄 ${p.name} — PPL Content Guide\n━━━━━━━━━━━━━━━━━━━━━\n\n🏷️ Brand: ${p.brand}\n🌏 Country: ${flag} ${p.country||'KR'}\n📂 Category: ${t('cat.'+(p.category||'cream'))} | ${p.productType||''}\n💰 Price: ${p.priceInfo||'-'}\n🏪 Channel: ${p.salesChannel||'-'}\n${p.startDate?'📅 Period: '+p.startDate+' ~ '+(p.endDate||''):''}\n\n✨ Brand Positioning\n${p.positioning||'-'}\n\n⭐ Key Selling Points\n${p.sellingPoints||'-'}\n\n🧪 Ingredients\n${p.ingredients||'-'}\n\n🤲 How to Use\n${p.howToUse||'-'}\n\n🎬 Content Flow\n${p.contentFlow||'-'}\n\n📸 Visual Guide\n${p.visualGuide||'-'}\n\n📢 Tags\nBrand: ${p.brandTag||'-'}\nHashtags: ${p.hashtags||'-'}\nKey Mention: ${p.keyMention||'-'}\n\n✅ Do's\n${p.dos||'-'}\n\n❌ Don'ts\n${p.donts||'-'}\n\n⚠️ Cautions\n${p.cautions||'-'}\n\n🔗 Reference\n${p.reference||'-'}\n━━━━━━━━━━━━━━━━━━━━━`;
+  navigator.clipboard.writeText(text).then(()=>toast(t('toast.copied'))).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast(t('toast.copied'));});
+}
+
+// ==================== EXPORT/IMPORT ====================
+function exportData(){const b=new Blob([JSON.stringify(products,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`ppl-guides-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(u);toast(t('toast.exported'));}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(Array.isArray(d)){products=[...products,...d];save();renderDashboard();buildCountryFilter();toast(`📂 ${d.length} guides imported`);}}catch{toast('⚠️ Invalid file');}};r.readAsText(f);e.target.value='';}
+
+// ==================== SAMPLE ====================
+function loadSampleData(){
+  if(products.length>0){
+    document.getElementById('cIcon').textContent='✨';document.getElementById('cTitle').textContent=t('confirm.sampleTitle');
+    document.getElementById('cMsg').textContent=t('confirm.sampleMsg');document.getElementById('cBtn').className='btn btn-primary';
+    document.getElementById('cBtn').textContent=t('confirm.add');document.getElementById('cBtn').onclick=()=>{addSamples();closeConfirm();};
+    document.getElementById('confirmDialog').classList.add('show');return;
+  }
+  addSamples();
+}
+function addSamples(){
+  const now=new Date().toISOString();
+  const s=[
+    {id:genId(),name:'리쥬더마 EX 리페어링 크림',brand:'리쥬더마',category:'cream',status:'active',country:'KR',productType:'크림',
+    priceInfo:'20g / 45,000원 → 39,200원',salesChannel:'올리브영',startDate:'2026-04-01',endDate:'2026-04-30',
+    positioning:'리쥬란 제조사 파마리서치의 DNA 특허 기술 기반 시술 후 애프터 케어 브랜드',
+    sellingPoints:'c-PDRN 1% 함유, 고순도 연어 PDRN 10,000ppm\n응급 진정 4배↑, 손상 장벽 강화 4배↑\n1회 사용 후 보습 효과 223%\nEGF+CICA+판테놀 올인원',
+    ingredients:'c-PDRN 1%\nEGF + CICA + 판테놀',howToUse:'꾸덕한 크림 제형\n① 소량씩 콕콕 ② 톡톡 두드려 흡수',
+    contentFlow:'[시술 후 올영 들르는 이유] 애프터케어 올영템 소개\n[프로 관리러의 꿀팁] 전문 연출 + 리페어팩\n[Before & After] 시술 직후 → 30분 후 변화',
+    visualGuide:'시술 후 자극받은 피부 촬영\n크림 사용 모습 필수\nBefore/After 비교컷',
+    brandTag:'@rejuderma.official',hashtags:'#리쥬더마 #리쥬란 #오리지널PDRN #애프터케어크림',
+    keyMention:'PDRN의 원조는 리쥬란!',dos:"제품명: '리쥬더마 리페어링 크림'\n시술명: '리쥬란'으로만\nc-PDRN: 소문자 필수",
+    donts:"'리쥬란 힐러' 표기 금지\nC-PDRN 대문자 금지\n통증 부정 내용 지양",cautions:'광고 표기 필수\n의약품적 효능 금지',
+    reference:'',mainImage:null,refImages:[],createdAt:now,updatedAt:now},
+    {id:genId(),name:'Rejuderma EX Repairing Cream',brand:'Rejuderma',category:'cream',status:'active',country:'US',productType:'Cream',
+    priceInfo:'20g / $35',salesChannel:'Brand Website, Amazon',startDate:'2026-04-15',endDate:'2026-05-15',
+    positioning:'Advanced dermo-care by Pharmaresearch, maker of REJURAN skin booster',
+    sellingPoints:'c-PDRN 1% — salmon PDRN 10,000ppm\n4x faster calming, 4x barrier repair\n223% hydration boost\nEGF+CICA+Panthenol all-in-one',
+    ingredients:'c-PDRN 1%\nEGF + CICA + Panthenol',howToUse:'Rich cream, zero stickiness\n① Dot small amounts ② Gently pat',
+    contentFlow:'[Post-Treatment Essential] Must-have after aesthetics\n[Pro Tip] Expert application + repair pack\n[Before & After] Immediate → 30min → visible change',
+    visualGuide:'Post-treatment redness shots\nCream application close-up\nBefore/After comparison',
+    brandTag:'@rejuderma.official',hashtags:'#Rejuderma #PDRN #AfterCareCream #KBeauty',
+    keyMention:'The original PDRN by REJURAN',dos:"Name: 'Rejuderma Repairing Cream'\nc-PDRN: always lowercase",
+    donts:'No medical claims\nNo competitor comparison\nNo exaggerated editing',cautions:'Must include #ad disclosure\nFDA-compliant language',
+    reference:'',mainImage:null,refImages:[],createdAt:new Date(Date.now()-86400000).toISOString(),updatedAt:now},
+    {id:genId(),name:'글로우 비타민C 앰플',brand:'글로우랩',category:'ampoule',status:'draft',country:'KR',productType:'앰플',
+    priceInfo:'30ml / 38,000원',salesChannel:'올리브영',startDate:'',endDate:'',
+    positioning:'피부과 전문의 감수 순수 비타민C 20% 앰플',
+    sellingPoints:'순수 비타민C 20% — 톤업 & 잡티 케어\n피부과 전문의 3인 감수\n비건 인증',
+    ingredients:'순수 비타민C 20%\n비타민E + 페룰산\n히알루론산',howToUse:'맑은 워터 제형\n① 2~3방울 도포 ② 크림 마무리',
+    contentFlow:'[모닝 루틴] 아침 스킨케어 포함\n[2주 변화] 전후 비교',
+    visualGuide:'텍스처 클로즈업\n자연광 촬영',brandTag:'@glowlab_official',hashtags:'#글로우랩 #비타민C앰플',
+    keyMention:'피부과 전문의 감수 비타민C',dos:'자연광 촬영\n텍스처 컷',donts:"'미백' 표현 금지\n과도한 필터 금지",
+    cautions:'광고 표기 필수',reference:'',mainImage:null,refImages:[],
+    createdAt:new Date(Date.now()-172800000).toISOString(),updatedAt:now},
+    {id:genId(),name:'シカ リペアパッド',brand:'リジュダーマ',category:'pad',status:'active',country:'JP',productType:'パッド',
+    priceInfo:'70枚 / ¥3,200',salesChannel:'Qoo10, 公式サイト',startDate:'2026-05-01',endDate:'2026-05-31',
+    positioning:'CICA成分配合の鎮静パッド。施術後や敏感肌のデイリーケアに。',
+    sellingPoints:'CICA + マデカソシド高濃度配合\nやさしいエンボス面+スムース面の両面設計\n低刺激テスト済み',
+    ingredients:'CICA\nマデカソシド\nパンテノール',howToUse:'洗顔後、1枚取り出して肌に貼り付ける\n5-10分後に剥がしてパッティング',
+    contentFlow:'[朝の時短ケア] 忙しい朝のスキンケアをパッド1枚で\n[ビフォーアフター] 使用前後の赤み比較',
+    visualGuide:'パッドを顔に貼る場面\nテクスチャーのクローズアップ',
+    brandTag:'@rejuderma.official',hashtags:'#リジュダーマ #シカパッド #鎮静ケア',keyMention:'施術後のファーストケア',
+    dos:"商品名は'シカ リペアパッド'\n低刺激を強調",donts:'医薬品表現禁止\n競合比較禁止',cautions:'PR表記必須',
+    reference:'',mainImage:null,refImages:[],createdAt:new Date(Date.now()-259200000).toISOString(),updatedAt:now}
+  ];
+  products.push(...s);save();renderDashboard();buildCatFilter();buildCountryFilter();toast(t('toast.sampleAdded'));
+}
+
+// ==================== UTILS ====================
+function toast(msg){const el=document.createElement('div');el.className='toast';el.innerHTML=msg;document.getElementById('toastC').appendChild(el);setTimeout(()=>el.remove(),3000);}
+
+function handleHash(){
+  // 먼저 ?share= 파라미터 체크 (새 공유 방식)
+  const urlParams=new URLSearchParams(window.location.search);
+  const shareToken=urlParams.get('share');
+  if(shareToken && !isViewerMode){
+    // initApp에서 이미 처리했으므로 여기선 스킵
+    return;
+  }
+
+  // 기존 #view= 해시 방식도 지원 (하위 호환)
+  const hash=window.location.hash;
+  if(hash.startsWith('#view=')){
+    document.body.classList.add('viewer-mode');
+    const viewId=hash.replace('#view=','');
+    // DB에서 로드 시도
+    if(typeof supabaseClient!=='undefined'){
+      supabaseClient.from('guides').select('*').eq('id',viewId).single().then(({data})=>{
+        if(data){
+          const p=fromDbFields(data);
+          if(!products.find(x=>x.id===p.id))products.push(p);
+          viewDetail(p.id);
+        } else { viewDetail(viewId); }
+      }).catch(()=>viewDetail(viewId));
+    } else { viewDetail(viewId); }
+  }
+  else if(hash.startsWith('#guide=')){viewDetail(hash.replace('#guide=',''));}
+}
+
+window.addEventListener('hashchange',handleHash);
+document.getElementById('productModal').addEventListener('click',e=>{if(e.target.id==='productModal')closeModal();});
+document.getElementById('shareModal').addEventListener('click',e=>{if(e.target.id==='shareModal')closeShareModal();});
+document.getElementById('confirmDialog').addEventListener('click',e=>{if(e.target.id==='confirmDialog')closeConfirm();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeConfirm();closeShareModal();}});
+
+// ==================== INIT ====================
+applyLang();renderDashboard();updateStats();buildCatFilter();buildCountryFilter();
+
+
+// Enter 키로 로그인/회원가입
+document.getElementById('authEmail')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('authPassword').focus();});
+document.getElementById('authPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin();});
+document.getElementById('signupName')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('signupEmail').focus();});
+document.getElementById('signupEmail')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('signupPassword').focus();});
+document.getElementById('signupPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')handleSignup();});
+
+// Supabase 초기화
+initApp().then(() => {
+  handleHash();
+}).catch(e => {
+  console.error('Init error:', e);
+  // fallback: 기존 방식으로 동작
+  handleHash();
+});
+
+
+// ==================== SUPABASE CONFIG ====================
+const SUPABASE_URL = 'https://zvdyaxisfgbdefhhiyyu.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2ZHlheGlzZmdiZGVmaGhpeXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyODI3NDIsImV4cCI6MjA5MTg1ODc0Mn0.LJnIUK1GeFwPRMFZZV76XL_5boPaFQdGK0QTTk26aAk';
+
+// Supabase Client 초기화
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let isViewerMode = false;
+
+// ==================== AUTH FUNCTIONS ====================
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function showLogin() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('authError').style.display = 'none';
+}
+
+function showSignup() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('signupForm').style.display = 'block';
+  document.getElementById('authError').style.display = 'none';
+}
+
+async function handleLogin() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  if (!email || !password) { showAuthError('이메일과 비밀번호를 입력해주세요.'); return; }
+
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    onAuthSuccess(data.user);
+  } catch (e) {
+    showAuthError(e.message === 'Invalid login credentials' ? '이메일 또는 비밀번호가 올바르지 않습니다.' : e.message);
+  }
+}
+
+async function handleSignup() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  if (!name || !email || !password) { showAuthError('모든 필드를 입력해주세요.'); return; }
+  if (password.length < 6) { showAuthError('비밀번호는 6자 이상이어야 합니다.'); return; }
+
+  try {
+    const { data, error } = await supabaseClient.auth.signUp({ 
+      email, password, 
+      options: { data: { display_name: name } }
+    });
+    if (error) throw error;
+
+    // 프로필 생성
+    await supabaseClient.from('user_profiles').insert({
+      id: data.user.id, email, display_name: name, role: 'editor'
+    });
+
+    onAuthSuccess(data.user);
+  } catch (e) {
+    showAuthError(e.message.includes('already registered') ? '이미 가입된 이메일입니다.' : e.message);
+  }
+}
+
+async function handleLogout() {
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  document.getElementById('authOverlay').style.display = 'flex';
+  document.getElementById('userBar').style.display = 'none';
+}
+
+function onAuthSuccess(user) {
+  currentUser = user;
+  document.getElementById('authOverlay').style.display = 'none';
+
+  // 사용자 바 업데이트
+  const bar = document.getElementById('userBar');
+  bar.style.display = 'flex';
+  const nameStr = user.user_metadata?.display_name || user.email.split('@')[0];
+  document.getElementById('userAvatar').textContent = nameStr.charAt(0).toUpperCase();
+  document.getElementById('userEmail').textContent = nameStr;
+  document.getElementById('userRole').textContent = user.email;
+
+  // 데이터 로드
+  loadFromSupabase();
+}
+
+// ==================== SUPABASE DATA OPERATIONS ====================
+function showSync(type) {
+  const el = document.getElementById('syncIndicator');
+  el.className = 'sync-indicator ' + type;
+  if (type === 'syncing') {
+    el.innerHTML = '<span>⟳</span><span>저장 중...</span>';
+  } else if (type === 'synced') {
+    el.innerHTML = '<span>✓</span><span>저장 완료</span>';
+    setTimeout(() => el.className = 'sync-indicator', 2000);
+  } else if (type === 'error') {
+    el.innerHTML = '<span>✕</span><span>저장 실패</span>';
+    setTimeout(() => el.className = 'sync-indicator', 3000);
+  }
+}
+
+// DB에서 field 이름 변환 (camelCase → snake_case)
+function toDbFields(p) {
+  return {
+    id: p.id,
+    product_name: p.name,
+    brand: p.brand,
+    category: p.category || 'cream',
+    status: p.status || 'active',
+    country: p.country || 'KR',
+    how_to_use: p.howToUse || '',
+    content_flow: p.contentFlow || '',
+    required_angles: p.visualGuide || '',
+    tags_mentions: JSON.stringify({
+      productType: p.productType || '',
+      priceInfo: p.priceInfo || '',
+      salesChannel: p.salesChannel || '',
+      startDate: p.startDate || '',
+      endDate: p.endDate || '',
+      positioning: p.positioning || '',
+      sellingPoints: p.sellingPoints || '',
+      ingredients: p.ingredients || '',
+      brandTag: p.brandTag || '',
+      hashtags: p.hashtags || '',
+      keyMention: p.keyMention || '',
+      reference: p.reference || ''
+    }),
+    dos: p.dos || '',
+    donts: p.donts || '',
+    caution: p.cautions || '',
+    additional_notes: '',
+    main_image: p.mainImage || null,
+    share_token: p.shareToken || null,
+    created_by: currentUser?.id || null
+  };
+}
+
+// DB → 앱 field 변환 (snake_case → camelCase)
+function fromDbFields(d) {
+  let extra = {};
+  try { extra = JSON.parse(d.tags_mentions || '{}'); } catch(e) {}
+  return {
+    id: d.id,
+    name: d.product_name,
+    brand: d.brand,
+    category: d.category || 'cream',
+    status: d.status || 'active',
+    country: d.country || 'KR',
+    productType: extra.productType || '',
+    priceInfo: extra.priceInfo || '',
+    salesChannel: extra.salesChannel || '',
+    startDate: extra.startDate || '',
+    endDate: extra.endDate || '',
+    positioning: extra.positioning || '',
+    sellingPoints: extra.sellingPoints || '',
+    ingredients: extra.ingredients || '',
+    howToUse: d.how_to_use || '',
+    contentFlow: d.content_flow || '',
+    visualGuide: d.required_angles || '',
+    brandTag: extra.brandTag || '',
+    hashtags: extra.hashtags || '',
+    keyMention: extra.keyMention || '',
+    dos: d.dos || '',
+    donts: d.donts || '',
+    cautions: d.caution || '',
+    reference: extra.reference || '',
+    mainImage: d.main_image || null,
+    refImages: [],
+    shareToken: d.share_token || null,
+    createdAt: d.created_at,
+    updatedAt: d.updated_at
+  };
+}
+
+async function loadFromSupabase() {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  try {
+    const { data, error } = await supabaseClient
+      .from('guides')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    products = (data || []).map(fromDbFields);
+    save(); // localStorage에도 캐시
+    renderDashboard(); renderProducts(); renderArchive();
+    updateStats(); buildCatFilter(); buildCountryFilter();
+  } catch(e) {
+    console.error('Load error:', e);
+    toast('데이터 로드 실패: ' + e.message);
+    // fallback: localStorage에서 로드
+    products = JSON.parse(localStorage.getItem('ppl_cosme_v3') || '[]');
+  } finally {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+}
+
+async function saveToSupabase(product) {
+  showSync('syncing');
+  try {
+    const dbData = toDbFields(product);
+    const { error } = await supabaseClient
+      .from('guides')
+      .upsert(dbData, { onConflict: 'id' });
+
+    if (error) throw error;
+    showSync('synced');
+  } catch(e) {
+    console.error('Save error:', e);
+    showSync('error');
+    toast('서버 저장 실패: ' + e.message);
+  }
+}
+
+async function deleteFromSupabase(id) {
+  showSync('syncing');
+  try {
+    const { error } = await supabaseClient
+      .from('guides')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    showSync('synced');
+  } catch(e) {
+    console.error('Delete error:', e);
+    showSync('error');
+  }
+}
+
+// ==================== IMAGE UPLOAD TO SUPABASE STORAGE ====================
+async function uploadImageToStorage(file) {
+  const ext = file.name.split('.').pop();
+  const fileName = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2,6) + '.' + ext;
+  const filePath = 'uploads/' + fileName;
+
+  try {
+    const { data, error } = await supabaseClient.storage
+      .from('guide-images')
+      .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+    if (error) throw error;
+
+    const { data: urlData } = supabaseClient.storage
+      .from('guide-images')
+      .getPublicUrl(filePath);
+
+    return urlData.publicUrl;
+  } catch(e) {
+    console.error('Upload error:', e);
+    toast('이미지 업로드 실패: ' + e.message);
+    // fallback: base64
+    return await fileToB64Local(file);
+  }
+}
+
+function fileToB64Local(f) {
+  return new Promise(r => {
+    const rd = new FileReader();
+    rd.onload = e => r(e.target.result);
+    rd.readAsDataURL(f);
+  });
+}
+
+// ==================== SHARE LINK (DB-based) ====================
+function generateShareToken() {
+  return 'share_' + Date.now().toString(36) + Math.random().toString(36).substr(2,8);
+}
+
+async function openShareModalDB(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+
+  let token = p.shareToken;
+  if (!token) {
+    token = generateShareToken();
+    p.shareToken = token;
+    // DB에 share_token 저장
+    await supabaseClient
+      .from('guides')
+      .update({ share_token: token })
+      .eq('id', id);
+  }
+
+  const shareUrl = window.location.href.split('#')[0].split('?')[0] + '?share=' + token;
+  document.getElementById('shareLinkInput').value = shareUrl;
+  document.getElementById('shareModal').classList.add('show');
+}
+
+async function loadSharedGuide(token) {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  try {
+    const { data, error } = await supabaseClient
+      .from('guides')
+      .select('*')
+      .eq('share_token', token)
+      .single();
+
+    if (error) throw error;
+    if (!data) { toast('가이드를 찾을 수 없습니다.'); return; }
+
+    const product = fromDbFields(data);
+    products = [product];
+
+    // 뷰어 모드로 표시
+    document.getElementById('authOverlay').style.display = 'none';
+    document.getElementById('loadingOverlay').style.display = 'none';
+    document.body.classList.add('viewer-mode');
+    isViewerMode = true;
+    viewDetail(product.id);
+  } catch(e) {
+    console.error('Share load error:', e);
+    toast('공유 가이드를 불러올 수 없습니다.');
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+}
+
+// ==================== APP INIT (with Supabase) ====================
+async function initApp() {
+  // 1. 공유 링크 체크
+  const urlParams = new URLSearchParams(window.location.search);
+  const shareToken = urlParams.get('share');
+
+  if (shareToken) {
+    // 공유 링크로 접속 → 로그인 불필요, 바로 가이드 표시
+    isViewerMode = true;
+    await loadSharedGuide(shareToken);
+    return;
+  }
+
+  // 2. 기존 세션 체크
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    onAuthSuccess(session.user);
+  } else {
+    // 로그인 화면 표시
+    document.getElementById('authOverlay').style.display = 'flex';
+  }
+
+  // 3. Auth 상태 변화 감지
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      onAuthSuccess(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+    }
+  });
+}
+
+</script>
+</body>
+</html>
