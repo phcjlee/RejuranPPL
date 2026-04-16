@@ -299,7 +299,6 @@
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
 <div class="auth-screen" id="authScreen">
   <div class="auth-box">
     <div class="auth-logo"><div class="logo-icon">💄</div></div>
@@ -382,7 +381,6 @@
   <div id="page-detail" class="page" style="display:none;"></div>
 </div>
 
-<!-- ADD/EDIT MODAL -->
 <div class="modal-overlay" id="productModal">
   <div class="modal">
     <div class="modal-header">
@@ -717,7 +715,7 @@ ko:{
   "share.title":"🔗 가이드 공유 링크","share.desc":"아래 링크를 공유하면 누구나 해당 가이드를 열람할 수 있습니다. (편집 불가)",
   "search.placeholder":"제품명, 브랜드로 검색...","search.archive":"아카이브 검색...",
   "empty.noGuide":"아직 등록된 가이드가 없습니다","empty.noGuideDesc":"새 제품 가이드를 등록하거나 샘플 데이터를 불러와보세요!",
-  "empty.noResult":"제품을 찾을 수 없습니다","empty.noResultDesc":"검색 조건을 변경하거나 새 가이드를 등록하세요",
+  "empty.noResult":"제품을 찾을 수 없습니다","empty.noResultDesc":"검 조건을 변경하거나 새 가이드를 등록하세요",
   "empty.noArchive":"아카이브가 비어있습니다","empty.noArchiveDesc":"완료된 캠페인을 아카이브하면 여기에 보관됩니다",
   "toast.saved":"✅ 가이드가 저장되었습니다","toast.deleted":"🗑️ 삭제되었습니다","toast.archived":"🗄️ 아카이브되었습니다",
   "toast.restored":"✅ 복원되었습니다","toast.copied":"📋 가이드 텍스트가 복사되었습니다",
@@ -844,24 +842,77 @@ function save(){localStorage.setItem('ppl_cosme_v3',JSON.stringify(products));up
 function genId(){return 'p'+Date.now()+Math.random().toString(36).substr(2,6);}
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-// ==================== DRAG & DROP ====================
+// ==================== DRAG & DROP & UPLOAD (Storage 방식 적용) ====================
 function setupDragDrop(areaId,isMultiple){
   const area=document.getElementById(areaId);if(!area)return;
   area.addEventListener('dragover',e=>{e.preventDefault();area.classList.add('dragover');});
   area.addEventListener('dragleave',()=>area.classList.remove('dragover'));
-  area.addEventListener('drop',async e=>{e.preventDefault();area.classList.remove('dragover');
-    if(isMultiple){for(const f of Array.from(e.dataTransfer.files)){if(f.type.startsWith('image/'))tempRefImgs.push(await fileToB64(f));}renderRefPreviews();}
-    else{const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){tempMainImg=await fileToB64(f);document.getElementById('mainImgPreview').innerHTML=`<div class="img-preview-item"><img src="${tempMainImg}"><button class="remove-img" onclick="tempMainImg=null;this.parentElement.remove()">✕</button></div>`;}}
+  area.addEventListener('drop',async e=>{
+    e.preventDefault();area.classList.remove('dragover');
+    if(isMultiple){
+      for(const f of Array.from(e.dataTransfer.files)){
+        if(f.type.startsWith('image/')){
+          const url = await uploadImageToStorage(f);
+          if(url) tempRefImgs.push(url);
+        }
+      }
+      renderRefPreviews();
+    }
+    else{
+      const f=e.dataTransfer.files[0];
+      if(f&&f.type.startsWith('image/')){
+        const url = await uploadImageToStorage(f);
+        if(url){
+          tempMainImg=url;
+          document.getElementById('mainImgPreview').innerHTML=`<div class="img-preview-item"><img src="${tempMainImg}"><button class="remove-img" onclick="tempMainImg=null;this.parentElement.remove()">✕</button></div>`;
+        }
+      }
+    }
     markDirty();
   });
 }
-function fileToB64(f){return new Promise(r=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);rd.readAsDataURL(f);});}
-async function handleMainImg(e){
-  const f=e.target.files[0];if(!f)return;tempMainImg=await fileToB64(f);
-  document.getElementById('mainImgPreview').innerHTML=`<div class="img-preview-item"><img src="${tempMainImg}"><button class="remove-img" onclick="tempMainImg=null;this.parentElement.remove()">✕</button></div>`;
-  markDirty();
+
+// Storage 전용 업로드 함수 
+async function uploadImageToStorage(file) {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 5)}.${fileExt}`;
+    const filePath = `uploads/${fileName}`;
+
+    const { error: uploadError } = await sb.storage
+      .from('images')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = sb.storage
+      .from('images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  } catch (error) {
+    console.error('이미지 업로드 실패:', error);
+    toast('이미지 업로드에 실패했습니다.');
+    return null;
+  }
 }
-async function handleRefImgs(e){for(const f of Array.from(e.target.files))tempRefImgs.push(await fileToB64(f));renderRefPreviews();markDirty();}
+
+async function handleMainImg(e){
+  const f=e.target.files[0];if(!f)return;
+  const url = await uploadImageToStorage(f);
+  if(url){
+    tempMainImg=url;
+    document.getElementById('mainImgPreview').innerHTML=`<div class="img-preview-item"><img src="${tempMainImg}"><button class="remove-img" onclick="tempMainImg=null;this.parentElement.remove()">✕</button></div>`;
+    markDirty();
+  }
+}
+async function handleRefImgs(e){
+  for(const f of Array.from(e.target.files)){
+    const url = await uploadImageToStorage(f);
+    if(url) tempRefImgs.push(url);
+  }
+  renderRefPreviews();markDirty();
+}
 function renderRefPreviews(){
   const c=document.getElementById('refImgsPreview');if(!c)return;
   c.innerHTML=tempRefImgs.map((img,i)=>`<div class="img-preview-item"><img src="${img}"><button class="remove-img" onclick="tempRefImgs.splice(${i},1);renderRefPreviews()">✕</button></div>`).join('');
@@ -1071,7 +1122,6 @@ function openAddModal(){
   populateLoadSelect();buildSelects();
   modalDirty=false;
   updateDraftIndicator('');
-  // Check for saved draft
   const draft=localStorage.getItem('ppl_draft');
   if(draft){
     if(confirm(t('modal.draftRestore'))){
@@ -1100,7 +1150,6 @@ function openEditModal(id){
   tempAngles=[...(p.angles||[]).map(a=>({...a}))];
   tempDos=[...(p.dosItems||[]).map(d=>({...d}))];
   tempDonts=[...(p.dontItems||[]).map(d=>({...d}))];
-  // backward compat
   if(tempDos.length===0 && p.dos){p.dos.split('\n').filter(Boolean).forEach(line=>tempDos.push({image:null,text:line.replace(/^[•\-]\s*/,'')}));}
   if(tempDonts.length===0 && p.donts){p.donts.split('\n').filter(Boolean).forEach(line=>tempDonts.push({image:null,text:line.replace(/^[•\-]\s*/,'')}));}
   if(tempStoryboard.length===0 && p.contentFlow){p.contentFlow.split('\n').filter(Boolean).forEach(line=>{const m=line.match(/^\[(.+?)\]\s*(.+)/);tempStoryboard.push({image:null,title:m?m[1]:'',desc:m?m[2]:line});});}
@@ -1216,7 +1265,6 @@ function closeConfirm(){document.getElementById('confirmDialog').classList.remov
 // ==================== SHARE (Supabase-based) ====================
 async function openShareModal(id){
   const p=products.find(x=>x.id===id);if(!p)return;
-  // Generate share token if not exists
   if(!p.shareToken){
     p.shareToken='s'+Date.now().toString(36)+Math.random().toString(36).substr(2,8);
     save();
@@ -1282,7 +1330,6 @@ async function addSamples(){
     createdAt:new Date(Date.now()-172800000).toISOString(),updatedAt:now}
   ];
   products.push(...s);save();
-  // Save to Supabase
   if(currentUser){for(const p of s)await saveToSupabase(p);}
   renderProducts();buildCatFilter();buildCountryFilter();toast(t('toast.sampleAdded'));
 }
@@ -1306,7 +1353,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeConfirm();clos
 // Track dirty state on all form inputs
 document.getElementById('productModal').addEventListener('input',()=>markDirty());
 
-// ==================== STORYBOARD ====================
+// ==================== STORYBOARD (Storage 적용) ====================
 function addStoryboardStep(){tempStoryboard.push({image:null,title:'',desc:''});renderStoryboard();markDirty();}
 function removeStoryboardStep(idx){tempStoryboard.splice(idx,1);renderStoryboard();markDirty();}
 function renderStoryboard(){
@@ -1329,11 +1376,15 @@ function renderStoryboard(){
 }
 function pickStoryboardImg(idx){
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-  inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;tempStoryboard[idx].image=await fileToB64(f);renderStoryboard();markDirty();};
+  inp.onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
+    const url = await uploadImageToStorage(f);
+    if(url){tempStoryboard[idx].image=url;renderStoryboard();markDirty();}
+  };
   inp.click();
 }
 
-// ==================== REQUIRED ANGLES ====================
+// ==================== REQUIRED ANGLES (Storage 적용) ====================
 function addAngleItem(){tempAngles.push({image:null,title:'',desc:''});renderAngles();markDirty();}
 function removeAngleItem(idx){tempAngles.splice(idx,1);renderAngles();markDirty();}
 function renderAngles(){
@@ -1355,11 +1406,15 @@ function renderAngles(){
 }
 function pickAngleImg(idx){
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-  inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;tempAngles[idx].image=await fileToB64(f);renderAngles();markDirty();};
+  inp.onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
+    const url = await uploadImageToStorage(f);
+    if(url){tempAngles[idx].image=url;renderAngles();markDirty();}
+  };
   inp.click();
 }
 
-// ==================== DO'S & DON'TS ====================
+// ==================== DO'S & DON'TS (Storage 적용) ====================
 function addDoDontItem(type){
   if(type==='dos'){tempDos.push({image:null,text:''});renderDoDontItems('dos');}
   else{tempDonts.push({image:null,text:''});renderDoDontItems('donts');}
@@ -1392,10 +1447,14 @@ function renderDoDontItems(type){
 }
 function pickDoDontImg(type,idx){
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-  inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;
-    if(type==='dos'){tempDos[idx].image=await fileToB64(f);renderDoDontItems('dos');}
-    else{tempDonts[idx].image=await fileToB64(f);renderDoDontItems('donts');}
-    markDirty();
+  inp.onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
+    const url = await uploadImageToStorage(f);
+    if(url){
+      if(type==='dos'){tempDos[idx].image=url;renderDoDontItems('dos');}
+      else{tempDonts[idx].image=url;renderDoDontItems('donts');}
+      markDirty();
+    }
   };inp.click();
 }
 
